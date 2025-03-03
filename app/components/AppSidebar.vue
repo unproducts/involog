@@ -2,22 +2,16 @@
 import type { SidebarProps } from '@/components/Ui/sidebar';
 
 import {
-  BookOpen,
-  Bot,
   Command,
-  Frame,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
-  Settings2,
-  SquareTerminal,
   House,
   Users,
   ReceiptText,
   ArrowRightLeft,
   ChartNoAxesGantt,
   ShoppingCart,
+  Settings,
 } from 'lucide-vue-next';
 
 const props = withDefaults(defineProps<SidebarProps>(), {
@@ -44,33 +38,38 @@ const data = {
   projects: [
     {
       name: 'Dashboard',
-      url: '#',
+      url: '/dashboard',
       icon: House,
     },
     {
       name: 'Clients',
-      url: '#',
+      url: '/clients',
       icon: Users,
     },
     {
       name: 'Invoices',
-      url: '#',
+      url: '/invoices',
       icon: ReceiptText,
     },
     {
       name: 'Transactions',
-      url: '#',
+      url: '/transactions',
       icon: ArrowRightLeft,
     },
     {
       name: 'Services',
-      url: '#',
+      url: '/services',
       icon: ChartNoAxesGantt,
     },
     {
       name: 'Items',
-      url: '#',
+      url: '/items',
       icon: ShoppingCart,
+    },
+    {
+      name: 'Preferences',
+      url: '/preferences',
+      icon: Settings,
     },
   ],
 };
@@ -80,22 +79,20 @@ const data = {
     <ShadSidebarHeader>
       <ShadSidebarMenu>
         <ShadSidebarMenuItem>
-          <ShadSidebarMenuButton size="lg" as-child>
-            <a href="#">
-              <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-stone-900 text-stone-50">
-                <Command class="size-4" />
-              </div>
-              <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-semibold">Involog</span>
-                <span class="truncate text-xs">v1.0.0</span>
-              </div>
-            </a>
-          </ShadSidebarMenuButton>
+          <div class="flex items-center gap-2">
+            <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-stone-900 text-stone-50">
+              <Command class="size-4" />
+            </div>
+            <div class="grid flex-1 text-left text-sm leading-tight">
+              <span class="truncate font-bold">Involog</span>
+              <span class="truncate text-xs">v1.0.0</span>
+            </div>
+          </div>
         </ShadSidebarMenuItem>
       </ShadSidebarMenu>
     </ShadSidebarHeader>
     <ShadSidebarContent>
-      <NavProjects :projects="data.projects" />
+      <NavPrimary :items="data.projects" />
       <NavSecondary :items="data.navSecondary" class="mt-auto" />
     </ShadSidebarContent>
     <ShadSidebarFooter>

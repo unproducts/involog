@@ -10,9 +10,14 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/google-fonts'],
   tailwindcss: {
     cssPath: ['~/assets/tailwind.css', { injectPosition: 'first' }],
+  },
+  googleFonts: {
+    families: {
+      Poppins: true,
+    },
   },
   shadcn: {
     prefix: 'Shad',

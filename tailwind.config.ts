@@ -1,3 +1,4 @@
+import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
@@ -13,6 +14,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+      },
       colors: {
         stone: {
           '50': '#f7fde8',
@@ -66,4 +70,4 @@ export default {
     },
   },
   plugins: [tailwindcssAnimate],
-};
+} satisfies Config;

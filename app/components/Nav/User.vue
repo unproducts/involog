@@ -2,7 +2,7 @@
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-vue-next';
 import { useSidebar } from '@/components/Ui/sidebar';
 
-const props = defineProps<{
+defineProps<{
   user: {
     name: string;
     email: string;
