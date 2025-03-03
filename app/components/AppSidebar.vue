@@ -1,0 +1,105 @@
+<script setup lang="ts">
+import type { SidebarProps } from '@/components/Ui/sidebar';
+
+import {
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  LifeBuoy,
+  Map,
+  PieChart,
+  Send,
+  Settings2,
+  SquareTerminal,
+  House,
+  Users,
+  ReceiptText,
+  ArrowRightLeft,
+  ChartNoAxesGantt,
+  ShoppingCart,
+} from 'lucide-vue-next';
+
+const props = withDefaults(defineProps<SidebarProps>(), {
+  variant: 'inset',
+});
+const data = {
+  user: {
+    name: 'Aman Desai',
+    email: 'aman@knackline.com',
+    avatar: '/avatars/shadcn.jpg',
+  },
+  navSecondary: [
+    {
+      title: 'Support',
+      url: '#',
+      icon: LifeBuoy,
+    },
+    {
+      title: 'Feedback',
+      url: '#',
+      icon: Send,
+    },
+  ],
+  projects: [
+    {
+      name: 'Dashboard',
+      url: '#',
+      icon: House,
+    },
+    {
+      name: 'Clients',
+      url: '#',
+      icon: Users,
+    },
+    {
+      name: 'Invoices',
+      url: '#',
+      icon: ReceiptText,
+    },
+    {
+      name: 'Transactions',
+      url: '#',
+      icon: ArrowRightLeft,
+    },
+    {
+      name: 'Services',
+      url: '#',
+      icon: ChartNoAxesGantt,
+    },
+    {
+      name: 'Items',
+      url: '#',
+      icon: ShoppingCart,
+    },
+  ],
+};
+</script>
+<template>
+  <ShadSidebar v-bind="props">
+    <ShadSidebarHeader>
+      <ShadSidebarMenu>
+        <ShadSidebarMenuItem>
+          <ShadSidebarMenuButton size="lg" as-child>
+            <a href="#">
+              <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-stone-900 text-stone-50">
+                <Command class="size-4" />
+              </div>
+              <div class="grid flex-1 text-left text-sm leading-tight">
+                <span class="truncate font-semibold">Involog</span>
+                <span class="truncate text-xs">v1.0.0</span>
+              </div>
+            </a>
+          </ShadSidebarMenuButton>
+        </ShadSidebarMenuItem>
+      </ShadSidebarMenu>
+    </ShadSidebarHeader>
+    <ShadSidebarContent>
+      <NavProjects :projects="data.projects" />
+      <NavSecondary :items="data.navSecondary" class="mt-auto" />
+    </ShadSidebarContent>
+    <ShadSidebarFooter>
+      <NavUser :user="data.user" />
+    </ShadSidebarFooter>
+  </ShadSidebar>
+</template>

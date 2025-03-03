@@ -1,3 +1,3 @@
 <template>
-  <ShadButton>ABC</ShadButton>
+  <NuxtLayout> </NuxtLayout>
 </template>
