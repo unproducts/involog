@@ -7,10 +7,11 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: {
         'data-mode': 'light',
+        lang: 'en',
       },
     },
   },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/google-fonts'],
+  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/google-fonts' /**, '@nuxtjs/html-validator' */],
   tailwindcss: {
     cssPath: ['~/assets/tailwind.css', { injectPosition: 'first' }],
   },

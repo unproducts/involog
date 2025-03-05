@@ -15,7 +15,7 @@ defineProps<{
       <span class="text-xl font-bold text-stone-900">{{ title }}</span>
     </div>
   </header>
-  <main class="w-full h-full p-4">
+  <section class="w-full h-full p-4">
     <slot />
-  </main>
+  </section>
 </template>

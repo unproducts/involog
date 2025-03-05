@@ -1,10 +1,8 @@
-import type { Config } from 'tailwindcss';
 import tailwindcssAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['selector', '[data-mode="dark"]'],
-  content: ['./src/**/*.{vue,js,ts,jsx,tsx,md}', './.vitepress/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     container: {
       center: true,
@@ -70,4 +68,4 @@ export default {
     },
   },
   plugins: [tailwindcssAnimate],
-} satisfies Config;
+};
