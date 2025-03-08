@@ -10,40 +10,35 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, User, User2, Users } from 'lucide-vue-next';
-import { ShadBadge, ShadButton, ShadCheckbox } from '#components';
+import { ArrowUpDown, MoreVertical } from 'lucide-vue-next';
+import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { TransactionSchema } from '~~/shared/schemas/transactions';
-import { expenseCategoriesMap, incomeCategoriesMap } from '~~/shared/consts/transactions';
+import type { ProductSchema } from '~~/shared/schemas/products';
 
 const props = defineProps<{
-  transactions: TransactionSchema[];
+  products: ProductSchema[];
 }>();
 
-const transactions = toRef(() => props.transactions);
-
-const { findById } = useClients();
-
-const columns: ColumnDef<TransactionSchema>[] = [
+const columns: ColumnDef<ProductSchema>[] = [
   {
     id: 'select',
     header: ({ table }) =>
       h(ShadCheckbox, {
         modelValue: table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
         'onUpdate:modelValue': (value) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Select all transactions',
+        ariaLabel: 'Select all products',
       }),
     cell: ({ row }) =>
       h(ShadCheckbox, {
         modelValue: row.getIsSelected(),
         'onUpdate:modelValue': (value) => row.toggleSelected(!!value),
-        ariaLabel: 'Select transaction',
+        ariaLabel: 'Select product',
       }),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: 'description',
+    accessorKey: 'name',
     header: ({ column }) => {
       return h(
         ShadButton,
@@ -52,38 +47,13 @@ const columns: ColumnDef<TransactionSchema>[] = [
           class: '!pl-0',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Description', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+        () => ['Name', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('description')),
+    cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
   },
   {
-    accessorKey: 'merchant-client',
-    header: () => h('div', { class: 'capitalize' }, 'Merchant/Client'),
-    cell: ({ row }) => {
-      // let displayValue = row.original.merchant;
-      if (row.original.clientId) {
-        const client = findById(row.original.clientId);
-        return client
-          ? h(
-              ShadButton,
-              {
-                variant: 'ghost',
-                class: '-ml-4',
-                // TODO: implement this.
-                // onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-              },
-              () => [h(User2, { class: 'h-4 w-4' }), client.name]
-            )
-          : h('div', { class: 'italic' }, 'Unknown Client');
-      } else if (row.original.merchant) {
-        return h('div', { class: 'capitalize' }, row.original.merchant);
-      }
-      return h('div', { class: 'italic' }, 'No Merchant Specified');
-    },
-  },
-  {
-    accessorKey: 'type',
+    accessorKey: 'price',
     header: ({ column }) => {
       return h(
         ShadButton,
@@ -92,79 +62,37 @@ const columns: ColumnDef<TransactionSchema>[] = [
           class: '!pl-0',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Income/Expense', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+        () => ['Price', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
     cell: ({ row }) => {
-      const variant = row.getValue('type') === 'I' ? 'default' : 'secondary';
-      const type = row.getValue('type') === 'I' ? 'Income' : 'Expense';
-      return h(ShadBadge, { class: 'w-18 text-center', variant }, () => [
-        h(type == 'Income' ? MoveDownRight : MoveUpLeft, { class: 'h-3 w-3 mr-1' }),
-        type,
-      ]);
-    },
-  },
-  {
-    accessorKey: 'category',
-    header: ({ column }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-        },
-        () => ['Category', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      );
-    },
-    cell: ({ row }) => {
-      const categoryKey = row.getValue('category') as string;
-      const type = row.getValue('type');
-      // @ts-expect-error categoryKey type
-      const category = type === 'I' ? incomeCategoriesMap[categoryKey] : expenseCategoriesMap[categoryKey];
-      return h(ShadButton, { variant: 'ghost' }, () => category);
-    },
-  },
-  {
-    accessorKey: 'amount',
-    header: ({ column }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          class: '!pl-0',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-        },
-        () => ['Amount', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      );
-    },
-    cell: ({ row }) => {
-      const type = row.getValue('type') === 'I' ? 'Income' : 'Expense';
-      let amountRaw = row.getValue('amount') as string | number | undefined;
-      if (!amountRaw) {
-        return h('div', { class: 'italic' }, 'Unknown Amount');
+      let priceRaw = row.getValue('price') as string | number | undefined;
+      if (!priceRaw) {
+        return h('div', { class: 'italic' }, 'Unknown Price');
       }
 
       try {
-        amountRaw = Number(amountRaw);
+        priceRaw = Number(priceRaw);
       } catch (e) {
-        return h('div', { class: 'italic' }, 'Invalid Amount');
+        return h('div', { class: 'italic' }, 'Invalid Price');
       }
 
       const currency = row.original.currency;
-      const amount = Intl.NumberFormat('en-US', {
+      const price = Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency,
-      }).format(amountRaw);
+      }).format(priceRaw);
 
-      return h('div', { class: [type === 'Expense' && 'text-rose-600'] }, amount);
+      return h('div', {}, price);
     },
   },
+
   {
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
       return h(DropdownAction, {
-        transaction: row.original,
+        product: row.original,
       });
     },
   },
@@ -177,12 +105,12 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
-const selectedTransactions = computed(
-  () => Object.keys(rowSelection.value).map((index) => props.transactions[Number(index)]) || []
-) as ComputedRef<TransactionSchema[]>;
+const selectedProducts = computed(
+  () => Object.keys(rowSelection.value).map((index) => props.products[Number(index)]) || []
+) as ComputedRef<ProductSchema[]>;
 
 const table = useVueTable({
-  data: transactions,
+  data: props.products,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -212,9 +140,6 @@ const table = useVueTable({
     },
   },
 });
-
-// Disable unnecessary columns initially.
-table.getColumn('description')?.toggleVisibility(false);
 </script>
 
 <template>
@@ -222,9 +147,9 @@ table.getColumn('description')?.toggleVisibility(false);
     <div class="flex items-center pb-4">
       <ShadInput
         class="max-w-sm"
-        placeholder="Filter transactions..."
-        :model-value="table.getColumn('description')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('description')?.setFilterValue($event)"
+        placeholder="Filter products..."
+        :model-value="table.getColumn('name')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
       />
       <ShadDropdownMenu>
         <ShadDropdownMenuTrigger as-child>
@@ -249,7 +174,10 @@ table.getColumn('description')?.toggleVisibility(false);
           </ShadDropdownMenuCheckboxItem>
         </ShadDropdownMenuContent>
       </ShadDropdownMenu>
-      <TransactionEditDropdownBulk :transactions="selectedTransactions" v-if="showBulkActions" />
+      <ProductEditDropdownBulk :products="selectedProducts" v-if="showBulkActions" />
+      <ProductEditOrCreateTrigger v-else>
+        <ShadButton as="span"> New Product </ShadButton>
+      </ProductEditOrCreateTrigger>
     </div>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>

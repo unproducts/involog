@@ -62,8 +62,8 @@ const data = {
       icon: ChartNoAxesGantt,
     },
     {
-      name: 'Items',
-      url: '/items',
+      name: 'Products',
+      url: '/products',
       icon: ShoppingCart,
     },
     {
