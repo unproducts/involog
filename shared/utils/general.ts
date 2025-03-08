@@ -1,3 +1,6 @@
+import { getLocalTimeZone, type DateValue } from '@internationalized/date';
+import { formatDate as formatDate0 } from '@vueuse/core';
+
 export const isValidDate = (dateString: string): boolean => {
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!regex.test(dateString)) {
@@ -16,3 +19,6 @@ export const extractDate = (dateString: string): Date => {
   const [year, month, day] = dateString.split('-').map(Number);
   return new Date(year!, month! - 1, day);
 };
+
+export const formatDate = (date: Date) => formatDate0(date, 'YYYY-MM-DD');
+export const formatCalendarDate = (date: DateValue) => formatDate0(date.toDate(getLocalTimeZone()), 'MMMM D, YYYY');

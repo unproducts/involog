@@ -21,19 +21,23 @@ const transactionFields = {
   notes: z.string().max(5000, 'Notes cannot be longer than 5000 chars').optional(),
 };
 
-const baseTransactionSchema = z.object({
+// TODO: extract it to be global and shared across all assets.
+const supplimentalFields = {
   id: z.string().uuid(),
-  ...transactionFields,
-});
-export type BaseTransactionSchema = z.infer<typeof baseTransactionSchema>;
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+} as const;
 
 const expenseTransactionFields = {
   ...transactionFields,
-  category: z.string().refine((c) => expenseCategories.includes(c as ExpenseCategory), 'Invalid category code.'),
+  category: z
+    .string()
+    .refine((c) => expenseCategories.includes(c as ExpenseCategory), 'Invalid category code.')
+    .optional(),
 };
 
 export const expenseTransactionSchema = z.object({
-  id: z.string().uuid(),
+  ...supplimentalFields,
   ...expenseTransactionFields,
 });
 export type ExpenseTransactionSchema = z.infer<typeof expenseTransactionSchema>;
@@ -44,18 +48,21 @@ export const createExpenseTransactionSchema = z.object({
 export type CreateExpenseTransactionSchema = z.infer<typeof createExpenseTransactionSchema>;
 
 export const updateExpenseTransactionSchema = z.object({
-  id: z.string().uuid(),
+  id: supplimentalFields.id,
   ...expenseTransactionFields,
 });
 export type UpdateExpenseTransactionSchema = z.infer<typeof updateExpenseTransactionSchema>;
 
 const incomeTransactionFields = {
   ...transactionFields,
-  category: z.string().refine((c) => incomeCategories.includes(c as IncomeCategory), 'Invalid category code.'),
+  category: z
+    .string()
+    .refine((c) => incomeCategories.includes(c as IncomeCategory), 'Invalid category code.')
+    .optional(),
 };
 
 export const incomeTransactionSchema = z.object({
-  id: z.string().uuid(),
+  ...supplimentalFields,
   ...incomeTransactionFields,
 });
 export type IncomeTransactionSchema = z.infer<typeof incomeTransactionSchema>;
@@ -66,7 +73,7 @@ export const createIncomeTransactionSchema = z.object({
 export type CreateIncomeTransactionSchema = z.infer<typeof createIncomeTransactionSchema>;
 
 export const updateIncomeTransactionSchema = z.object({
-  id: z.string().uuid(),
+  id: supplimentalFields.id,
   ...incomeTransactionFields,
 });
 export type UpdateIncomeTransactionSchema = z.infer<typeof updateIncomeTransactionSchema>;

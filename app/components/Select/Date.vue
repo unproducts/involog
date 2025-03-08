@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { CalendarDate, DateFormatter, type DateValue, getLocalTimeZone } from '@internationalized/date';
 import { useVModel } from '@vueuse/core';
 import { CalendarIcon } from 'lucide-vue-next';
-import { extractDate } from '~~/shared/utils/general';
+import { extractDate, formatCalendarDate } from '~~/shared/utils/general';
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'long',
@@ -23,12 +23,7 @@ if (props.modelValue) {
 
 watch(value, (newValue) => {
   if (newValue) {
-    const year = `${newValue.year}`;
-    // pad month with 0 if less than 10
-    const month = newValue.month < 10 ? `0${newValue.month}` : `${newValue.month}`;
-    // pad day with 0 if less than 10
-    const day = newValue.day < 10 ? `0${newValue.day}` : `${newValue.day}`;
-    selectedValue.value = `${year}-${month}-${day}`;
+    selectedValue.value = formatCalendarDate(newValue);
   } else {
     selectedValue.value = undefined;
   }

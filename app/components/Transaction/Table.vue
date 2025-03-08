@@ -10,36 +10,46 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical } from 'lucide-vue-next';
-import { ShadButton, ShadCheckbox } from '#components';
+import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, User, User2, Users } from 'lucide-vue-next';
+import { ShadBadge, ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { ClientSchema } from '~~/shared/schemas/clients';
 import { countryDetailsMap } from '~~/shared/consts/countries';
+import type { TransactionSchema } from '~~/shared/schemas/transactions';
+import {
+  expenseCategories,
+  expenseCategoriesMap,
+  incomeCategoriesMap,
+  incomeCategoryDetails,
+} from '~~/shared/consts/transactions';
 
 const props = defineProps<{
-  clients: ClientSchema[];
+  transactions: TransactionSchema[];
 }>();
 
-const columns: ColumnDef<ClientSchema>[] = [
+const transactions = toRef(() => props.transactions);
+
+const { findById } = useClients();
+
+const columns: ColumnDef<TransactionSchema>[] = [
   {
     id: 'select',
     header: ({ table }) =>
       h(ShadCheckbox, {
         modelValue: table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
         'onUpdate:modelValue': (value) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Select all clients',
+        ariaLabel: 'Select all transactions',
       }),
     cell: ({ row }) =>
       h(ShadCheckbox, {
         modelValue: row.getIsSelected(),
         'onUpdate:modelValue': (value) => row.toggleSelected(!!value),
-        ariaLabel: 'Select client',
+        ariaLabel: 'Select transaction',
       }),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: 'name',
+    accessorKey: 'description',
     header: ({ column }) => {
       return h(
         ShadButton,
@@ -48,27 +58,111 @@ const columns: ColumnDef<ClientSchema>[] = [
           class: '!pl-0',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Name', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+        () => ['Description', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => h('div', { class: 'capitalize' }, row.getValue('name')),
+    cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('description')),
   },
   {
-    accessorKey: 'email',
-    header: () => h('div', { class: 'capitalize' }, 'Email'),
-    cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email')),
-  },
-  {
-    accessorKey: 'country',
-    header: () => h('div', { class: 'capitalize' }, 'Country'),
+    accessorKey: 'merchant-client',
+    header: () => h('div', { class: 'capitalize' }, 'Merchant/Client'),
     cell: ({ row }) => {
-      const countryKey = row.getValue('country') as keyof typeof countryDetailsMap | undefined;
-      if (!countryKey || !Object.hasOwn(countryDetailsMap, countryKey)) {
-        return h('div', { class: 'italic' }, 'Unknown Country');
+      // let displayValue = row.original.merchant;
+      if (row.original.clientId) {
+        const client = findById(row.original.clientId);
+        return client
+          ? h(
+              ShadButton,
+              {
+                variant: 'ghost',
+                class: '-ml-4',
+                // TODO: implement this.
+                // onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+              },
+              () => [h(User2, { class: 'h-4 w-4' }), client.name]
+            )
+          : h('div', { class: 'italic' }, 'Unknown Client');
+      } else if (row.original.merchant) {
+        return h('div', { class: 'capitalize' }, row.original.merchant);
       }
-      const country = countryDetailsMap[countryKey]!;
+      return h('div', { class: 'italic' }, 'No Merchant Specified');
+    },
+  },
+  {
+    accessorKey: 'type',
+    header: ({ column }) => {
+      return h(
+        ShadButton,
+        {
+          variant: 'ghost',
+          class: '!pl-0',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Income/Expense', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+      );
+    },
+    cell: ({ row }) => {
+      const variant = row.getValue('type') === 'I' ? 'default' : 'secondary';
+      const type = row.getValue('type') === 'I' ? 'Income' : 'Expense';
+      return h(ShadBadge, { class: 'w-18 text-center', variant }, () => [
+        h(type == 'Income' ? MoveDownRight : MoveUpLeft, { class: 'h-3 w-3 mr-1' }),
+        type,
+      ]);
+    },
+  },
+  {
+    accessorKey: 'category',
+    header: ({ column }) => {
+      return h(
+        ShadButton,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Category', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+      );
+    },
+    cell: ({ row }) => {
+      const categoryKey = row.getValue('category') as string;
+      const type = row.getValue('type');
+      // @ts-expect-error categoryKey type
+      const category = type === 'I' ? incomeCategoriesMap[categoryKey] : expenseCategoriesMap[categoryKey];
+      return h(ShadButton, { variant: 'ghost' }, () => category);
+    },
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => {
+      return h(
+        ShadButton,
+        {
+          variant: 'ghost',
+          class: '!pl-0',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Amount', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+      );
+    },
+    cell: ({ row }) => {
+      const type = row.getValue('type') === 'I' ? 'Income' : 'Expense';
+      let amountRaw = row.getValue('amount') as string | number | undefined;
+      if (!amountRaw) {
+        return h('div', { class: 'italic' }, 'Unknown Amount');
+      }
 
-      return h('div', { class: 'font-medium' }, country);
+      try {
+        amountRaw = Number(amountRaw);
+      } catch (e) {
+        return h('div', { class: 'italic' }, 'Invalid Amount');
+      }
+
+      const currency = row.original.currency;
+      const amount = Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+      }).format(amountRaw);
+
+      return h('div', { class: [type === 'Expense' && 'text-rose-600'] }, amount);
     },
   },
   {
@@ -76,7 +170,7 @@ const columns: ColumnDef<ClientSchema>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return h(DropdownAction, {
-        client: row.original,
+        transaction: row.original,
       });
     },
   },
@@ -89,12 +183,12 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
-const selectedClients = computed(
-  () => Object.keys(rowSelection.value).map((index) => props.clients[Number(index)]) || []
-) as ComputedRef<ClientSchema[]>;
+const selectedTransactions = computed(
+  () => Object.keys(rowSelection.value).map((index) => props.transactions[Number(index)]) || []
+) as ComputedRef<TransactionSchema[]>;
 
 const table = useVueTable({
-  data: props.clients,
+  data: transactions,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -124,6 +218,9 @@ const table = useVueTable({
     },
   },
 });
+
+// Disable unnecessary columns initially.
+table.getColumn('description')?.toggleVisibility(false);
 </script>
 
 <template>
@@ -131,9 +228,9 @@ const table = useVueTable({
     <div class="flex items-center pb-4">
       <ShadInput
         class="max-w-sm"
-        placeholder="Filter clients..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
+        placeholder="Filter transactions..."
+        :model-value="table.getColumn('description')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('description')?.setFilterValue($event)"
       />
       <ShadDropdownMenu>
         <ShadDropdownMenuTrigger as-child>
@@ -158,10 +255,7 @@ const table = useVueTable({
           </ShadDropdownMenuCheckboxItem>
         </ShadDropdownMenuContent>
       </ShadDropdownMenu>
-      <ClientEditDropdownBulk :clients="selectedClients" v-if="showBulkActions" />
-      <ClientEditOrCreateTrigger v-else>
-        <ShadButton as="span"> New Client </ShadButton>
-      </ClientEditOrCreateTrigger>
+      <TransactionEditDropdownBulk :transactions="selectedTransactions" v-if="showBulkActions" />
     </div>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
