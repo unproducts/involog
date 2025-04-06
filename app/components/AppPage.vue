@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <header class="flex h-16 shrink-0 items-center gap-2">
+  <header class="flex h-8 mt-4 shrink-0 items-center gap-2">
     <div class="flex items-center gap-2 px-4">
       <ShadSidebarTrigger class="-ml-1 text-stone-900" />
       <ShadSeparator orientation="vertical" class="mr-2 h-4" />

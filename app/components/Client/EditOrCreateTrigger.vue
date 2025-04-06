@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ClientSchema } from '~~/shared/schemas/clients';
+import type { ClientSchema } from '~~/shared/schemas/client';
 import EditOrCreate from './EditOrCreate.vue';
 
 defineProps<{
@@ -24,7 +24,7 @@ defineExpose({
 
 <template>
   <ShadDialog v-model:open="modalOpen">
-    <ShadDialogTrigger class="ml-auto">
+    <ShadDialogTrigger class="ml-auto" as-child>
       <slot />
     </ShadDialogTrigger>
     <ShadDialogContent>

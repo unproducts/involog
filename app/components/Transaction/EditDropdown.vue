@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MoreHorizontal, Edit3 } from 'lucide-vue-next';
-import type { TransactionSchema } from '~~/shared/schemas/transactions';
+import type { TransactionSchema } from '~~/shared/schemas/transaction';
 
 defineProps<{
   transaction: TransactionSchema;
@@ -30,3 +30,4 @@ defineProps<{
     </ShadDropdownMenu>
   </div>
 </template>
+~~/shared/schemas/transaction

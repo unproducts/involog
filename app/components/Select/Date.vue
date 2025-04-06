@@ -11,6 +11,7 @@ const df = new DateFormatter('en-US', {
 
 const props = defineProps<{
   modelValue?: string;
+  disabled?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
@@ -32,14 +33,15 @@ watch(value, (newValue) => {
 
 <template>
   <ShadPopover>
-    <ShadPopoverTrigger as-child>
-      <ShadButton
-        variant="outline-subtle"
-        :class="cn('w-full justify-start text-left font-normal', !value && 'text-muted-foreground !text-zinc-500')"
-      >
+    <ShadPopoverTrigger :value="value" :disabled="disabled">
+      <template #trigger>
         <CalendarIcon class="h-4 w-4 -ml-1" />
-        {{ value ? df.format(value.toDate(getLocalTimeZone())) : 'Select date' }}
-      </ShadButton>
+        Select date
+      </template>
+      <template #value>
+        <CalendarIcon class="h-4 w-4 -ml-1" />
+        {{ df.format(value!.toDate(getLocalTimeZone())) }}
+      </template>
     </ShadPopoverTrigger>
     <ShadPopoverContent class="w-auto p-0">
       <ShadCalendar v-model="value" initial-focus />

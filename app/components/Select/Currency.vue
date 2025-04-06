@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
 import { currencyDetails } from '~~/shared/consts/currencies';
+import { Banknote } from 'lucide-vue-next';
 
 const props = defineProps<{
   modelValue?: string;
@@ -12,7 +13,12 @@ const selectedValue = useVModel(props, 'modelValue');
 <template>
   <ShadSelect v-model:model-value="selectedValue">
     <ShadSelectTrigger>
-      <ShadSelectValue placeholder="Select Currency" />
+      <div class="flex items-center gap-2">
+        <ShadSelectIcon>
+          <Banknote class="h-4 w-4 -ml-1" />
+        </ShadSelectIcon>
+        <ShadSelectValue placeholder="Select Currency" />
+      </div>
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>

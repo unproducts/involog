@@ -257,8 +257,10 @@ export const countryDetailsMap = {
 
 export const countryCodes = Object.keys(countryDetailsMap);
 countryCodes.sort();
+Object.freeze(countryCodes);
 
 export const countryDetails = countryCodes.map((code) => ({
   country: countryDetailsMap[code as keyof typeof countryDetailsMap]!,
   code: code as keyof typeof countryDetailsMap,
 }));
+Object.freeze(countryDetails);

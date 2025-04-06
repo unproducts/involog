@@ -10,19 +10,15 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, User, User2, Users } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, User2 } from 'lucide-vue-next';
 import { ShadBadge, ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { TransactionSchema } from '~~/shared/schemas/transactions';
+import type { TransactionSchema } from '~~/shared/schemas/transaction';
 import { expenseCategoriesMap, incomeCategoriesMap } from '~~/shared/consts/transactions';
 
-const props = defineProps<{
-  transactions: TransactionSchema[];
-}>();
+const { transactions } = storeToRefs(useTransactionsStore());
 
-const transactions = toRef(() => props.transactions);
-
-const { findById } = useClients();
+const { findById } = useClientsStore();
 
 const columns: ColumnDef<TransactionSchema>[] = [
   {
@@ -178,11 +174,11 @@ const expanded = ref<ExpandedState>({});
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedTransactions = computed(
-  () => Object.keys(rowSelection.value).map((index) => props.transactions[Number(index)]) || []
+  () => Object.keys(rowSelection.value).map((index) => transactions.value[Number(index)]) || []
 ) as ComputedRef<TransactionSchema[]>;
 
 const table = useVueTable({
-  data: transactions,
+  data: transactions.value,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -219,37 +215,47 @@ table.getColumn('description')?.toggleVisibility(false);
 
 <template>
   <div class="w-full">
-    <div class="flex items-center pb-4">
-      <ShadInput
-        class="max-w-sm"
-        placeholder="Filter transactions..."
-        :model-value="table.getColumn('description')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('description')?.setFilterValue($event)"
-      />
-      <ShadDropdownMenu>
-        <ShadDropdownMenuTrigger as-child>
-          <ShadButton variant="ghost" class="w-8 h-8 p-0 ml-2">
-            <span class="sr-only">Open menu</span>
-            <MoreVertical class="w-4 h-4" />
-          </ShadButton>
-        </ShadDropdownMenuTrigger>
-        <ShadDropdownMenuContent align="end">
-          <ShadDropdownMenuCheckboxItem
-            v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
-            :key="column.id"
-            class="capitalize"
-            :model-value="column.getIsVisible()"
-            @update:model-value="
-              (value) => {
-                column.toggleVisibility(!!value);
-              }
-            "
-          >
-            {{ column.id }}
-          </ShadDropdownMenuCheckboxItem>
-        </ShadDropdownMenuContent>
-      </ShadDropdownMenu>
+    <div class="flex items-center justify-between gap-2 pb-4 w-full">
+      <div class="flex items-center w-full gap-2">
+        <ShadInput
+          class="w-1/2"
+          placeholder="Filter transactions..."
+          :model-value="table.getColumn('description')?.getFilterValue() as string"
+          @update:model-value="table.getColumn('description')?.setFilterValue($event)"
+        />
+        <ShadDropdownMenu>
+          <ShadDropdownMenuTrigger as-child>
+            <ShadButton variant="ghost" class="w-8 h-8 p-0">
+              <span class="sr-only">Open menu</span>
+              <MoreVertical class="w-4 h-4" />
+            </ShadButton>
+          </ShadDropdownMenuTrigger>
+          <ShadDropdownMenuContent align="end">
+            <ShadDropdownMenuCheckboxItem
+              v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
+              :key="column.id"
+              class="capitalize"
+              :model-value="column.getIsVisible()"
+              @update:model-value="
+                (value) => {
+                  column.toggleVisibility(!!value);
+                }
+              "
+            >
+              {{ column.id }}
+            </ShadDropdownMenuCheckboxItem>
+          </ShadDropdownMenuContent>
+        </ShadDropdownMenu>
+      </div>
       <TransactionEditDropdownBulk :transactions="selectedTransactions" v-if="showBulkActions" />
+      <div class="flex items-center gap-2" v-else>
+        <TransactionEditOrCreateTrigger type="I">
+          <ShadButton> <MoveDownRight /> New Income </ShadButton>
+        </TransactionEditOrCreateTrigger>
+        <TransactionEditOrCreateTrigger type="E">
+          <ShadButton variant="secondary"> <MoveUpLeft /> New Expense </ShadButton>
+        </TransactionEditOrCreateTrigger>
+      </div>
     </div>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
@@ -303,3 +309,4 @@ table.getColumn('description')?.toggleVisibility(false);
     </div>
   </div>
 </template>
+~~/shared/schemas/transaction

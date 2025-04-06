@@ -21,7 +21,7 @@ const { isMobile } = useSidebar();
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <ShadAvatar class="h-8 w-8 rounded-lg">
-              <ShadAvatarImage :src="user.avatar" :alt="user.name" />
+              <!-- <ShadAvatarImage :src="user.avatar" :alt="user.name" /> -->
               <ShadAvatarFallback class="rounded-lg"> AD </ShadAvatarFallback>
             </ShadAvatar>
             <div class="grid flex-1 text-left text-sm leading-tight">

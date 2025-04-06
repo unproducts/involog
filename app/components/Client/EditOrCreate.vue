@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import { createClientSchema, updateClientSchema, type ClientSchema } from '~~/shared/schemas/clients';
+import { createClientSchema, updateClientSchema, type ClientSchema } from '~~/shared/schemas/client';
 
 const props = defineProps<{
   client?: ClientSchema;

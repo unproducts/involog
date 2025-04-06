@@ -3,5 +3,7 @@ import { ReceiptText } from 'lucide-vue-next';
 </script>
 
 <template>
-  <AppPage title="Invoices" :icon="ReceiptText"> </AppPage>
+  <AppPage title="Invoices" :icon="ReceiptText">
+    <InvoiceEditOrCreate />
+  </AppPage>
 </template>

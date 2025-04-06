@@ -8,7 +8,7 @@ import {
   updateExpenseTransactionSchema,
   updateIncomeTransactionSchema,
   type TransactionSchema,
-} from '~~/shared/schemas/transactions';
+} from '~~/shared/schemas/transaction';
 
 const props = defineProps<{
   transaction?: TransactionSchema;
@@ -142,3 +142,4 @@ defineExpose({ submit });
     </ShadFormField>
   </form>
 </template>
+~~/shared/schemas/transaction

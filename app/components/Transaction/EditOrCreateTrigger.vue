@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TransactionType } from '~~/shared/consts/transactions';
 import EditOrCreate from './EditOrCreate.vue';
-import type { TransactionSchema } from '~~/shared/schemas/transactions';
+import type { TransactionSchema } from '~~/shared/schemas/transaction';
 
 defineProps<{
   transaction?: TransactionSchema;
@@ -26,7 +26,7 @@ defineExpose({
 
 <template>
   <ShadDialog v-model:open="modalOpen">
-    <ShadDialogTrigger class="ml-auto">
+    <ShadDialogTrigger class="ml-auto" as-child>
       <slot />
     </ShadDialogTrigger>
     <ShadDialogContent>
@@ -42,3 +42,4 @@ defineExpose({
     </ShadDialogContent>
   </ShadDialog>
 </template>
+~~/shared/schemas/transaction

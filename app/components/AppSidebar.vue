@@ -57,14 +57,9 @@ const data = {
       icon: ArrowRightLeft,
     },
     {
-      name: 'Services',
-      url: '/services',
+      name: 'Items',
+      url: '/items',
       icon: ChartNoAxesGantt,
-    },
-    {
-      name: 'Products',
-      url: '/products',
-      icon: ShoppingCart,
     },
     {
       name: 'Preferences',

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MoreHorizontal, Edit3 } from 'lucide-vue-next';
-import type { ClientSchema } from '~~/shared/schemas/clients';
+import type { ClientSchema } from '~~/shared/schemas/client';
 
 defineProps<{
   client: ClientSchema;

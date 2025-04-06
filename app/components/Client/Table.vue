@@ -13,12 +13,10 @@ import {
 import { ArrowUpDown, MoreVertical } from 'lucide-vue-next';
 import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { ClientSchema } from '~~/shared/schemas/clients';
+import type { ClientSchema } from '~~/shared/schemas/client';
 import { countryDetailsMap } from '~~/shared/consts/countries';
 
-const props = defineProps<{
-  clients: ClientSchema[];
-}>();
+const { clients } = storeToRefs(useClientsStore());
 
 const columns: ColumnDef<ClientSchema>[] = [
   {
@@ -90,11 +88,11 @@ const expanded = ref<ExpandedState>({});
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedClients = computed(
-  () => Object.keys(rowSelection.value).map((index) => props.clients[Number(index)]) || []
+  () => Object.keys(rowSelection.value).map((index) => clients.value[Number(index)]) || []
 ) as ComputedRef<ClientSchema[]>;
 
 const table = useVueTable({
-  data: props.clients,
+  data: clients.value,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),

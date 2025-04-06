@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
-import type { TransactionSchema } from '~~/shared/schemas/transactions';
+import type { TransactionSchema } from '~~/shared/schemas/transaction';
 
 defineProps<{
   transactions: TransactionSchema[];
@@ -20,3 +20,4 @@ defineProps<{
     </ShadDropdownMenuContent>
   </ShadDropdownMenu>
 </template>
+~~/shared/schemas/transaction

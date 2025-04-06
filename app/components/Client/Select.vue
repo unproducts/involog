@@ -6,7 +6,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { clients } = useClients();
+const { clients } = storeToRefs(useClientsStore());
 </script>
 
 <template>

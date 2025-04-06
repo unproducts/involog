@@ -11,7 +11,15 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/google-fonts' /**, '@nuxtjs/html-validator' */],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    '@nuxtjs/google-fonts' /**, '@nuxtjs/html-validator' */,
+    '@pinia/nuxt',
+  ],
+  pinia: {
+    storesDirs: ['./app/stores'],
+  },
   tailwindcss: {
     cssPath: ['~/assets/tailwind.css', { injectPosition: 'first' }],
   },
