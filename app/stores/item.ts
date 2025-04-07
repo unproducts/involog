@@ -3,7 +3,7 @@ import { currencyCodes } from '~~/shared/consts/currencies';
 import type { ItemSchema } from '~~/shared/schemas/item';
 import type { UnitSchema } from '~~/shared/schemas/measurement';
 
-export const useItemsStore = defineStore('itemsStore', () => {
+export const useItemsStore = defineStore('item', () => {
   const { units } = storeToRefs(useUnitsStore());
 
   const items = ref<ItemSchema[]>([]);

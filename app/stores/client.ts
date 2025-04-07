@@ -3,7 +3,7 @@ import { countryCodes } from '~~/shared/consts/countries';
 import { currencyCodes } from '~~/shared/consts/currencies';
 import type { ClientSchema } from '~~/shared/schemas/client';
 
-export const useClientsStore = defineStore('clients', () => {
+export const useClientsStore = defineStore('client', () => {
   const loading = ref(false);
   const clients = ref<ClientSchema[]>([]);
   const error = ref<Error | null>(null);

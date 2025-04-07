@@ -4,7 +4,7 @@ import { expenseCategories, incomeCategories } from '~~/shared/consts/transactio
 import type { ClientSchema } from '~~/shared/schemas/client';
 import type { TransactionSchema } from '~~/shared/schemas/transaction';
 
-export const useTransactionsStore = defineStore('transactions', () => {
+export const useTransactionsStore = defineStore('transaction', () => {
   const { clients } = storeToRefs(useClientsStore());
 
   const transactions = ref<TransactionSchema[]>([]);

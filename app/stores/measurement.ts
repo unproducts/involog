@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { UnitSchema } from '~~/shared/schemas/measurement';
 
-export const useUnitsStore = defineStore('units', () => {
+export const useUnitsStore = defineStore('unit', () => {
   const loading = ref(false);
   const units = ref<UnitSchema[]>([]);
   const error = ref<Error | null>(null);

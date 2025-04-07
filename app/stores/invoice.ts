@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import type { InvoicePrefixSchema, InvoiceSchema } from '~~/shared/schemas/invoice';
 
-export const useInvoicePrefixesStore = defineStore('invoicePrefixesStore', () => {
+export const useInvoicePrefixesStore = defineStore('invoicePrefix', () => {
   const invoicePrefixes = ref<InvoicePrefixSchema[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
@@ -30,7 +30,7 @@ const makeDummyInvoicePrefix = (): InvoicePrefixSchema => ({
   updatedAt: faker.date.recent().toISOString(),
 });
 
-export const useInvoicesStore = defineStore('invoicesStore', () => {
+export const useInvoicesStore = defineStore('invoice', () => {
   const invoices = ref<InvoiceSchema[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
