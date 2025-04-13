@@ -16,15 +16,7 @@ export const adjustmentEntryFields = (fieldName: string) => ({
     .max(255, `${fieldName} label cannot be longer than 255 chars`)
     .min(2, `${fieldName} label must have atleast 2 chars.`),
   isAbsolute: z.boolean().optional(),
-  amount: z.number().min(0, `${fieldName} amount must be a positive number`).optional(),
-  currency: z
-    .string()
-    .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.')
-    .optional(),
-  rate: z
-    .number()
-    .min(0, `${fieldName} rate must be a positive number`)
-    .max(100, `${fieldName} rate must be less than 100`),
+  value: z.number().min(0, `${fieldName} amount must be a positive number`),
 });
 
 export const adjustmentEntrySchema = z.object(adjustmentEntryFields('Root Adjustment'));

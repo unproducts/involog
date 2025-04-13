@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import EditOrCreate from './EditOrCreate.vue';
-import type { Item } from '~~/shared/schemas/item';
+import type { ItemSchema } from '~~/shared/schemas/item';
 
 defineProps<{
-  item?: Item;
+  item?: ItemSchema;
 }>();
 
 const editForm = ref<null | InstanceType<typeof EditOrCreate>>(null);
