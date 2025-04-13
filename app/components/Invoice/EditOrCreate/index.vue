@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Trash2 } from 'lucide-vue-next';
-import type { AdjustmentEntrySchema, ItemEntrySchema } from '~~/shared/schemas/invoice';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import type { AdjustmentEntrySchema, ItemEntrySchema, InvoiceSchema } from '~~/shared/schemas/invoice';
+import { createInvoiceSchema, updateInvoiceSchema } from '~~/shared/schemas/invoice';
 
 interface ItemEntryHolder {
   entry: ItemEntrySchema;
@@ -14,24 +17,34 @@ interface AdjustmentEntryHolder {
   adjustmentFormatted: string;
 }
 
-const clientId = ref<string>();
+const props = defineProps<{
+  invoice?: InvoiceSchema;
+}>();
+
+const isUpdating = !!props.invoice;
+
+const formSchema = toTypedSchema(isUpdating ? updateInvoiceSchema : createInvoiceSchema);
+const form = useForm({
+  validationSchema: formSchema,
+});
+
+if (isUpdating) {
+  form.setValues(props.invoice || {});
+}
+
 const showDueDate = ref(false);
 const itemEntries = ref<ItemEntryHolder[]>([]);
-const currency = ref<string>();
 const taxAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
 const discountAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
 
-// Add a new item entry
 const addItemEntry = () => {
   itemEntries.value = [...itemEntries.value, { entry: {} as ItemEntrySchema, hasErrors: false, subtotalFormatted: '' }];
 };
 
-// Remove an item entry
 const removeItemEntry = (index: number) => {
   itemEntries.value = itemEntries.value.filter((_, i) => i !== index);
 };
 
-// Add a new item entry
 const addAdjustmentEntry = (adjustmentEntries: Ref<AdjustmentEntryHolder[]>) => {
   adjustmentEntries.value = [
     ...adjustmentEntries.value,
@@ -39,7 +52,6 @@ const addAdjustmentEntry = (adjustmentEntries: Ref<AdjustmentEntryHolder[]>) => 
   ];
 };
 
-// Remove an item entry
 const removeAdjustmentEntry = (adjustmentEntries: Ref<AdjustmentEntryHolder[]>, index: number) => {
   adjustmentEntries.value = adjustmentEntries.value.filter((_, i) => i !== index);
 };
@@ -49,40 +61,76 @@ const removeTaxAdjustmentEntry = (index: number) => removeAdjustmentEntry(taxAdj
 
 const addDiscountAdjustmentEntry = () => addAdjustmentEntry(discountAdjustmentEntries);
 const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(discountAdjustmentEntries, index);
+
+const submit = form.handleSubmit((values) => {
+  console.log('Form submitted!', values);
+});
+
+defineExpose({ submit });
 </script>
 
 <template>
   <section class="flex w-full min-w-96">
-    <form class="flex flex-col w-1/3 p-2 space-y-4" @submit="() => {}">
+    <form class="flex flex-col w-1/3 p-2 space-y-4" @submit="submit">
       <section class="space-y-2 border-b border-zinc-200 pb-4">
         <div class="text-base font-bold">Details</div>
-        <div class="space-y-1">
-          <ShadLabel for="invoice-client">Client</ShadLabel>
-          <ClientSelect id="invoice-client" v-model="clientId" />
-        </div>
+        <ShadFormField v-slot="{ componentField }" name="clientId">
+          <ShadFormItem>
+            <ShadFormLabel>Client<span class="text-red-700">*</span></ShadFormLabel>
+            <ShadFormControl>
+              <ClientSelect v-bind="componentField" />
+            </ShadFormControl>
+            <ShadFormMessage />
+          </ShadFormItem>
+        </ShadFormField>
         <div class="flex gap-2">
-          <div class="space-y-1 w-1/2">
-            <ShadLabel for="invoice-prefix">Invoice Prefix</ShadLabel>
-            <InvoiceSelectPrefix id="invoice-prefix" class="w-full" />
-          </div>
-          <div class="space-y-1 w-1/2">
-            <ShadLabel for="invoice-number">Invoice number</ShadLabel>
-            <ShadInput id="invoice-number" type="string" placeholder="2/3-ABC" />
-          </div>
+          <ShadFormField v-slot="{ componentField }" name="prefixId" class="w-1/2">
+            <ShadFormItem>
+              <ShadFormLabel>Invoice Prefix<span class="text-red-700">*</span></ShadFormLabel>
+              <ShadFormControl>
+                <InvoiceSelectPrefix v-bind="componentField" class="w-full" />
+              </ShadFormControl>
+              <ShadFormMessage />
+            </ShadFormItem>
+          </ShadFormField>
+          <ShadFormField v-slot="{ componentField }" name="number" class="w-1/2">
+            <ShadFormItem>
+              <ShadFormLabel>Invoice number<span class="text-red-700">*</span></ShadFormLabel>
+              <ShadFormControl>
+                <ShadInput v-bind="componentField" type="string" placeholder="2/3-ABC" />
+              </ShadFormControl>
+              <ShadFormMessage />
+            </ShadFormItem>
+          </ShadFormField>
         </div>
-        <div class="space-y-1">
-          <ShadLabel for="currency">Currency</ShadLabel>
-          <SelectCurrency class="w-full" v-model="currency" />
-        </div>
+        <ShadFormField v-slot="{ componentField }" name="currency">
+          <ShadFormItem>
+            <ShadFormLabel>Currency<span class="text-red-700">*</span></ShadFormLabel>
+            <ShadFormControl>
+              <SelectCurrency v-bind="componentField" class="w-full" />
+            </ShadFormControl>
+            <ShadFormMessage />
+          </ShadFormItem>
+        </ShadFormField>
         <div class="flex gap-2">
-          <div class="space-y-1 w-1/2">
-            <ShadLabel for="issue-date">Issue Date</ShadLabel>
-            <SelectDate class="w-full" />
-          </div>
-          <div class="space-y-1 w-1/2">
-            <ShadLabel for="due-date">Due Date</ShadLabel>
-            <SelectDate :disabled="!showDueDate" class="w-full" />
-          </div>
+          <ShadFormField v-slot="{ componentField }" name="date" class="w-1/2">
+            <ShadFormItem>
+              <ShadFormLabel>Issue Date<span class="text-red-700">*</span></ShadFormLabel>
+              <ShadFormControl>
+                <SelectDate v-bind="componentField" class="w-full" />
+              </ShadFormControl>
+              <ShadFormMessage />
+            </ShadFormItem>
+          </ShadFormField>
+          <ShadFormField v-slot="{ componentField }" name="dueDate" class="w-1/2">
+            <ShadFormItem>
+              <ShadFormLabel>Due Date</ShadFormLabel>
+              <ShadFormControl>
+                <SelectDate v-bind="componentField" :disabled="!showDueDate" class="w-full" />
+              </ShadFormControl>
+              <ShadFormMessage />
+            </ShadFormItem>
+          </ShadFormField>
         </div>
         <div class="flex items-center space-x-2">
           <ShadCheckbox id="show-due-date" v-model="showDueDate" />
@@ -119,7 +167,7 @@ const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(d
                   v-model="itemEntries[index]!.entry"
                   v-model:has-errors="itemEntries[index]!.hasErrors"
                   v-model:subtotal-formatted="itemEntries[index]!.subtotalFormatted"
-                  :currency="currency"
+                  :currency="form.values.currency"
                 />
               </ShadAccordionContent>
             </ShadAccordionItem>
@@ -157,7 +205,7 @@ const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(d
                   v-model="taxAdjustmentEntries[index]!.entry"
                   v-model:has-errors="taxAdjustmentEntries[index]!.hasErrors"
                   v-model:adjustment-formatted="taxAdjustmentEntries[index]!.adjustmentFormatted"
-                  :currency="currency"
+                  :currency="form.values.currency"
                 />
               </ShadAccordionContent>
             </ShadAccordionItem>
@@ -197,12 +245,31 @@ const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(d
                   v-model="discountAdjustmentEntries[index]!.entry"
                   v-model:has-errors="discountAdjustmentEntries[index]!.hasErrors"
                   v-model:adjustment-formatted="discountAdjustmentEntries[index]!.adjustmentFormatted"
-                  :currency="currency"
+                  :currency="form.values.currency"
                 />
               </ShadAccordionContent>
             </ShadAccordionItem>
           </ShadAccordion>
         </section>
+      </section>
+      <section class="space-y-2 border-zinc-200" :class="{ 'border-b': itemEntries.length === 0 }">
+        <div class="flex justify-between items-center">
+          <div class="text-base font-semibold">Other Details</div>
+        </div>
+        <ShadFormField v-slot="{ componentField }" name="note">
+          <ShadFormItem>
+            <ShadFormLabel>Note</ShadFormLabel>
+            <ShadFormControl>
+              <ShadTextarea v-bind="componentField" placeholder="Add any additional notes here..." />
+            </ShadFormControl>
+            <ShadFormMessage />
+          </ShadFormItem>
+        </ShadFormField>
+        <div class="flex justify-end">
+          <ShadButton type="submit" variant="default">
+            {{ isUpdating ? 'Update Invoice' : 'Create Invoice' }}
+          </ShadButton>
+        </div>
       </section>
     </form>
     <div class="w-2/3 bg-zinc-50"></div>
