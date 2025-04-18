@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
-import type { Item } from '~~/shared/schemas/item';
+import type { ItemSchema } from '~~/shared/schemas/item';
 
 defineProps<{
-  items: Item[];
+  items: ItemSchema[];
 }>();
 </script>
 
