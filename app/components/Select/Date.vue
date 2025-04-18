@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
 import { CalendarDate, DateFormatter, type DateValue, getLocalTimeZone } from '@internationalized/date';
 import { useVModel } from '@vueuse/core';
 import { CalendarIcon } from 'lucide-vue-next';
-import { extractDate, formatCalendarDate } from '~~/shared/utils/general';
+import { extractDate, formatDate } from '~~/shared/utils/general';
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'long',
@@ -24,7 +23,7 @@ if (props.modelValue) {
 
 watch(value, (newValue) => {
   if (newValue) {
-    selectedValue.value = formatCalendarDate(newValue);
+    selectedValue.value = formatDate(newValue.toDate(getLocalTimeZone()));
   } else {
     selectedValue.value = undefined;
   }

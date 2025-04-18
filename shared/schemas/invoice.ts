@@ -4,7 +4,10 @@ import { supplimentalFields } from './_base';
 
 const itemEntryFields = {
   itemId: z.string().uuid(),
-  quantity: z.number().int().positive().optional(),
+  quantity: z
+    .number()
+    .positive()
+    .refine((q) => q > 0, 'Quantity must be greater than 0'),
   narration: z.string().max(255, 'Narration cannot be longer than 255 chars').optional(),
 };
 export const itemEntrySchema = z.object(itemEntryFields);
@@ -51,7 +54,11 @@ export type UpdateInvoicePrefixSchema = z.infer<typeof updateInvoicePrefixSchema
 
 const invoiceFields = {
   clientId: z.string().uuid(),
-  subject: z.string().max(255, 'Subject cannot be longer than 255 chars').min(2, 'Subject must have atleast 2 chars.'),
+  subject: z
+    .string()
+    .max(255, 'Subject cannot be longer than 255 chars')
+    .min(2, 'Subject must have atleast 2 chars.')
+    .optional(),
   prefixId: z.string().uuid(),
   number: z.string().max(255, 'Number cannot be longer than 255 chars').min(2, 'Number must have atleast 2 chars.'),
   date: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'), // date string, YYYY-MM-DD

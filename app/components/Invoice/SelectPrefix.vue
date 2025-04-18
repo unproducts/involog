@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
+import { useVModel } from '@vueuse/core';
 import { Check, ReceiptText, Plus } from 'lucide-vue-next';
+
+const props = defineProps<{
+  modelValue?: string;
+}>();
+
+const selectedValue = useVModel(props, 'modelValue');
 
 const invoicePrefixesStore = useInvoicePrefixesStore();
 const { invoicePrefixes } = storeToRefs(invoicePrefixesStore);
 
 const open = ref(false);
-const selectedId = ref('');
 const query = ref('');
 
 const createNewPrefix = async () => {
@@ -23,17 +29,17 @@ const showCreateNewPrefix = computed(
 
 <template>
   <ShadPopover v-model:open="open">
-    <ShadPopoverTrigger :value="selectedId">
+    <ShadPopoverTrigger :value="selectedValue">
       <template #icon>
         <ReceiptText class="h-4 w-4 -ml-1" />
       </template>
       <template #trigger> Select prefix </template>
       <template #value>
-        {{ invoicePrefixesStore.findById(selectedId)?.name }}
+        {{ invoicePrefixesStore.findById(selectedValue!)?.name }}
       </template>
     </ShadPopoverTrigger>
     <ShadPopoverContent align="start">
-      <ShadCommand v-model="selectedId" v-model:query="query" aria-label="Select prefix">
+      <ShadCommand v-model="selectedValue" v-model:query="query" aria-label="Select prefix">
         <ShadCommandInput placeholder="Search prefix..." />
         <ShadCommandList>
           <ShadCommandGroup>
@@ -43,7 +49,7 @@ const showCreateNewPrefix = computed(
               :value="prefix.id"
               @select="open = false"
             >
-              <Check :class="cn('mr-2 h-4 w-4', selectedId === prefix.id ? 'opacity-100' : 'opacity-0')" />
+              <Check :class="cn('mr-2 h-4 w-4', selectedValue === prefix.id ? 'opacity-100' : 'opacity-0')" />
               {{ prefix.name }}
             </ShadCommandItem>
             <ShadCommandItem :value="null" @select="createNewPrefix" v-if="showCreateNewPrefix">

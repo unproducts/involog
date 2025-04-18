@@ -37,6 +37,10 @@ const itemEntries = ref<ItemEntryHolder[]>([]);
 const taxAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
 const discountAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
 
+const itemEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
+const taxAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
+const discountAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
+
 const addItemEntry = () => {
   itemEntries.value = [...itemEntries.value, { entry: {} as ItemEntrySchema, hasErrors: false, subtotalFormatted: '' }];
 };
@@ -62,16 +66,53 @@ const removeTaxAdjustmentEntry = (index: number) => removeAdjustmentEntry(taxAdj
 const addDiscountAdjustmentEntry = () => addAdjustmentEntry(discountAdjustmentEntries);
 const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(discountAdjustmentEntries, index);
 
-const submit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values);
+const submitForm = form.handleSubmit(async (values) => {
+  console.log('Invoice form submitted!', values);
 });
+
+const submit = async () => {
+  try {
+    for (const ref of itemEntryRefs.value) {
+      await ref.submit();
+    }
+    for (const ref of taxAdjustmentEntryRefs.value) {
+      await ref.submit();
+    }
+    for (const ref of discountAdjustmentEntryRefs.value) {
+      await ref.submit();
+    }
+    const hasItemErrors = itemEntries.value.some((entry) => entry.hasErrors);
+    const hasTaxErrors = taxAdjustmentEntries.value.some((entry) => entry.hasErrors);
+    const hasDiscountErrors = discountAdjustmentEntries.value.some((entry) => entry.hasErrors);
+
+    if (hasItemErrors || hasTaxErrors || hasDiscountErrors) {
+      return;
+    }
+
+    const items = itemEntries.value.map((entry) => entry.entry);
+    const taxes = taxAdjustmentEntries.value.map((entry) => entry.entry);
+    const discounts = discountAdjustmentEntries.value.map((entry) => entry.entry);
+
+    // Update form values with child component values
+    form.setValues({
+      ...form.values,
+      items,
+      taxes,
+      discounts,
+    });
+
+    await submitForm();
+  } catch (error) {
+    console.error('Error during form submission:', error);
+  }
+};
 
 defineExpose({ submit });
 </script>
 
 <template>
   <section class="flex w-full min-w-96">
-    <form class="flex flex-col w-1/3 p-2 space-y-4" @submit="submit">
+    <form class="flex flex-col w-1/3 p-2 space-y-4" @submit.prevent="submit">
       <section class="space-y-2 border-b border-zinc-200 pb-4">
         <div class="text-base font-bold">Details</div>
         <ShadFormField v-slot="{ componentField }" name="clientId">
@@ -84,8 +125,8 @@ defineExpose({ submit });
           </ShadFormItem>
         </ShadFormField>
         <div class="flex gap-2">
-          <ShadFormField v-slot="{ componentField }" name="prefixId" class="w-1/2">
-            <ShadFormItem>
+          <ShadFormField v-slot="{ componentField }" name="prefixId">
+            <ShadFormItem class="w-1/2">
               <ShadFormLabel>Invoice Prefix<span class="text-red-700">*</span></ShadFormLabel>
               <ShadFormControl>
                 <InvoiceSelectPrefix v-bind="componentField" class="w-full" />
@@ -93,8 +134,8 @@ defineExpose({ submit });
               <ShadFormMessage />
             </ShadFormItem>
           </ShadFormField>
-          <ShadFormField v-slot="{ componentField }" name="number" class="w-1/2">
-            <ShadFormItem>
+          <ShadFormField v-slot="{ componentField }" name="number">
+            <ShadFormItem class="w-1/2">
               <ShadFormLabel>Invoice number<span class="text-red-700">*</span></ShadFormLabel>
               <ShadFormControl>
                 <ShadInput v-bind="componentField" type="string" placeholder="2/3-ABC" />
@@ -103,6 +144,15 @@ defineExpose({ submit });
             </ShadFormItem>
           </ShadFormField>
         </div>
+        <ShadFormField v-slot="{ componentField }" name="subject">
+          <ShadFormItem>
+            <ShadFormLabel>Subject</ShadFormLabel>
+            <ShadFormControl>
+              <ShadInput v-bind="componentField" type="string" placeholder="Invoice for..." />
+            </ShadFormControl>
+            <ShadFormMessage />
+          </ShadFormItem>
+        </ShadFormField>
         <ShadFormField v-slot="{ componentField }" name="currency">
           <ShadFormItem>
             <ShadFormLabel>Currency<span class="text-red-700">*</span></ShadFormLabel>
@@ -113,8 +163,8 @@ defineExpose({ submit });
           </ShadFormItem>
         </ShadFormField>
         <div class="flex gap-2">
-          <ShadFormField v-slot="{ componentField }" name="date" class="w-1/2">
-            <ShadFormItem>
+          <ShadFormField v-slot="{ componentField }" name="date">
+            <ShadFormItem class="w-1/2">
               <ShadFormLabel>Issue Date<span class="text-red-700">*</span></ShadFormLabel>
               <ShadFormControl>
                 <SelectDate v-bind="componentField" class="w-full" />
@@ -122,8 +172,8 @@ defineExpose({ submit });
               <ShadFormMessage />
             </ShadFormItem>
           </ShadFormField>
-          <ShadFormField v-slot="{ componentField }" name="dueDate" class="w-1/2">
-            <ShadFormItem>
+          <ShadFormField v-slot="{ componentField }" name="dueDate">
+            <ShadFormItem class="w-1/2">
               <ShadFormLabel>Due Date</ShadFormLabel>
               <ShadFormControl>
                 <SelectDate v-bind="componentField" :disabled="!showDueDate" class="w-full" />
@@ -164,6 +214,7 @@ defineExpose({ submit });
               </ShadAccordionTrigger>
               <ShadAccordionContent>
                 <InvoiceEditOrCreateItemEntry
+                  ref="itemEntryRefs"
                   v-model="itemEntries[index]!.entry"
                   v-model:has-errors="itemEntries[index]!.hasErrors"
                   v-model:subtotal-formatted="itemEntries[index]!.subtotalFormatted"
@@ -201,6 +252,7 @@ defineExpose({ submit });
               </ShadAccordionTrigger>
               <ShadAccordionContent>
                 <InvoiceEditOrCreateAdjustmentEntry
+                  ref="taxAdjustmentEntryRefs"
                   entry-type="tax"
                   v-model="taxAdjustmentEntries[index]!.entry"
                   v-model:has-errors="taxAdjustmentEntries[index]!.hasErrors"
@@ -241,6 +293,7 @@ defineExpose({ submit });
               </ShadAccordionTrigger>
               <ShadAccordionContent>
                 <InvoiceEditOrCreateAdjustmentEntry
+                  ref="discountAdjustmentEntryRefs"
                   entry-type="discount"
                   v-model="discountAdjustmentEntries[index]!.entry"
                   v-model:has-errors="discountAdjustmentEntries[index]!.hasErrors"

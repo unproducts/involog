@@ -17,14 +17,20 @@ const adjustmentEntry = useVModel(props, 'modelValue');
 const hasErrors = useVModel(props, 'hasErrors');
 const adjustmentFormatted = useVModel(props, 'adjustmentFormatted');
 
-const { values, errors } = useForm({
+const { values, errors, handleSubmit } = useForm<AdjustmentEntrySchema>({
   validationSchema: toTypedSchema(props.entryType === 'tax' ? taxEntrySchema : discountEntrySchema),
   initialValues: adjustmentEntry.value,
 });
 
-watch(errors, (value) => {
+watch(errors, (value: Record<string, string>) => {
   hasErrors.value = Object.keys(value).length > 0;
 });
+
+const submit = handleSubmit((formValues) => {
+  adjustmentEntry.value = formValues;
+});
+
+defineExpose({ submit });
 
 const onFormValuesChange = () => {
   if (!values.value) {

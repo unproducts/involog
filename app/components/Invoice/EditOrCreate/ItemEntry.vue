@@ -19,13 +19,22 @@ const subtotalFormatted = useVModel(props, 'subtotalFormatted');
 
 const itemsStore = useItemsStore();
 
-const { errors, values } = useForm({
+const { errors, values, handleSubmit } = useForm({
   validationSchema: toTypedSchema(itemEntrySchema),
   initialValues: itemEntry.value,
 });
 
 watch(errors, (value) => {
   hasErrors.value = Object.keys(value).length > 0;
+});
+
+const submit = handleSubmit((values) => {
+  console.log('Item entry submitted!', values);
+  itemEntry.value = values;
+});
+
+defineExpose({
+  submit,
 });
 
 const onFormValuesChange = () => {
@@ -64,7 +73,7 @@ watch(() => props.currency, onFormValuesChange);
     </ShadFormField>
     <ShadFormField v-slot="{ componentField }" name="quantity">
       <ShadFormItem>
-        <ShadFormLabel>Quantity</ShadFormLabel>
+        <ShadFormLabel>Quantity<span class="text-red-700">*</span></ShadFormLabel>
         <ShadFormControl>
           <ShadInput type="number" min="1" v-bind="componentField" />
         </ShadFormControl>
