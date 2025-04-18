@@ -41,6 +41,33 @@ const itemEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
 const taxAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
 const discountAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
 
+const openEntryValue = ref<string | string[] | undefined>(undefined);
+
+const scrollToOpenAccordionIfOpen = () => {
+  const element = document.querySelector(`[data-state="open"]`);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
+const scrollToFirstEntryError = () => {
+  const firstItemErrorIndex = itemEntries.value.findIndex((entry) => entry.hasErrors);
+  const firstTaxErrorIndex = taxAdjustmentEntries.value.findIndex((entry) => entry.hasErrors);
+  const firstDiscountErrorIndex = discountAdjustmentEntries.value.findIndex((entry) => entry.hasErrors);
+
+  if (firstItemErrorIndex !== -1) {
+    openEntryValue.value = `item-${firstItemErrorIndex}`;
+  } else if (firstTaxErrorIndex !== -1) {
+    openEntryValue.value = `tax-${firstTaxErrorIndex}`;
+  } else if (firstDiscountErrorIndex !== -1) {
+    openEntryValue.value = `discount-${firstDiscountErrorIndex}`;
+  } else if (firstDiscountErrorIndex !== -1) {
+    openEntryValue.value = `discount-${firstDiscountErrorIndex}`;
+  }
+
+  nextTick(scrollToOpenAccordionIfOpen);
+};
+
 const addItemEntry = () => {
   itemEntries.value = [...itemEntries.value, { entry: {} as ItemEntrySchema, hasErrors: false, subtotalFormatted: '' }];
 };
@@ -86,6 +113,7 @@ const submit = async () => {
     const hasDiscountErrors = discountAdjustmentEntries.value.some((entry) => entry.hasErrors);
 
     if (hasItemErrors || hasTaxErrors || hasDiscountErrors) {
+      scrollToFirstEntryError();
       return;
     }
 
@@ -193,8 +221,8 @@ defineExpose({ submit });
           <ShadButton type="button" size="xs" variant="outline-subtle" @click="addItemEntry">Add</ShadButton>
         </div>
         <section class="space-y-4">
-          <ShadAccordion type="single" class="w-full" collapsible :unmount-on-hide="false">
-            <ShadAccordionItem v-for="(_, index) in itemEntries" :key="index" :value="index.toString()">
+          <ShadAccordion v-model="openEntryValue" type="single" class="w-full" collapsible :unmount-on-hide="false">
+            <ShadAccordionItem v-for="(_, index) in itemEntries" :key="index" :value="`item-${index}`">
               <ShadAccordionTrigger>
                 <div class="flex items-center justify-between w-full pr-2">
                   <div class="flex items-center gap-2">
@@ -231,8 +259,8 @@ defineExpose({ submit });
           <ShadButton type="button" size="xs" variant="outline-subtle" @click="addTaxAdjustmentEntry"> Add </ShadButton>
         </div>
         <section class="space-y-4">
-          <ShadAccordion type="single" class="w-full" collapsible :unmount-on-hide="false">
-            <ShadAccordionItem v-for="(_, index) in taxAdjustmentEntries" :key="index" :value="index.toString()">
+          <ShadAccordion v-model="openEntryValue" type="single" class="w-full" collapsible :unmount-on-hide="false">
+            <ShadAccordionItem v-for="(_, index) in taxAdjustmentEntries" :key="index" :value="`tax-${index}`">
               <ShadAccordionTrigger>
                 <div class="flex items-center justify-between w-full">
                   <div class="flex items-center">
@@ -272,8 +300,12 @@ defineExpose({ submit });
           </ShadButton>
         </div>
         <section class="space-y-4">
-          <ShadAccordion type="single" class="w-full" collapsible :unmount-on-hide="false">
-            <ShadAccordionItem v-for="(_, index) in discountAdjustmentEntries" :key="index" :value="index.toString()">
+          <ShadAccordion v-model="openEntryValue" type="single" class="w-full" collapsible :unmount-on-hide="false">
+            <ShadAccordionItem
+              v-for="(_, index) in discountAdjustmentEntries"
+              :key="index"
+              :value="`discount-${index}`"
+            >
               <ShadAccordionTrigger>
                 <div class="flex items-center justify-between w-full">
                   <div class="flex items-center">
