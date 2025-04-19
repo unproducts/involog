@@ -10,7 +10,6 @@ import {
   ReceiptText,
   ArrowRightLeft,
   ChartNoAxesGantt,
-  ShoppingCart,
   Settings,
 } from 'lucide-vue-next';
 
@@ -74,10 +73,8 @@ const data = {
     <ShadSidebarHeader>
       <ShadSidebarMenu>
         <ShadSidebarMenuItem>
-          <div class="flex items-center gap-2">
-            <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-stone-900 text-stone-50">
-              <Command class="size-4" />
-            </div>
+          <div class="flex items-center gap-1">
+            <img src="../assets/icon.svg" class="size-12" />
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-bold">Involog</span>
               <span class="truncate text-xs">v1.0.0</span>
