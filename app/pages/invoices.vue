@@ -4,6 +4,6 @@ import { ReceiptText } from 'lucide-vue-next';
 
 <template>
   <AppPage title="Invoices" :icon="ReceiptText">
-    <InvoiceEditOrCreate />
+    <InvoiceTable class="mt-4" />
   </AppPage>
 </template>

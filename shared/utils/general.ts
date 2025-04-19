@@ -22,3 +22,10 @@ export const extractDate = (dateString: string): Date => {
 
 export const formatDate = (date: Date) => formatDate0(date, 'YYYY-MM-DD');
 export const formatCalendarDate = (date: DateValue) => formatDate0(date.toDate(getLocalTimeZone()), 'MMMM D, YYYY');
+
+/**
+ * Format a date string in the format YYYY-MM-DD to a human readable format
+ * @param dateStr - The date string to format
+ * @returns The formatted date string
+ */
+export const formatDateFromStr = (dateStr: string) => formatDate0(extractDate(dateStr), 'MMMM D, YYYY');

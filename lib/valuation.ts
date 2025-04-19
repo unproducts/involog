@@ -1,8 +1,30 @@
 import { z } from 'zod';
-import { adjustmentEntrySchema, type AdjustmentEntrySchema } from '~~/shared/schemas/invoice';
+import {
+  adjustmentEntrySchema,
+  type AdjustmentEntrySchema,
+  type InvoiceSchema,
+  invoiceSchema,
+} from '~~/shared/schemas/invoice';
 import { itemSchema, type ItemSchema } from '~~/shared/schemas/item';
 
-export const calculateItemSubtotal = (item: ItemSchema, quantity?: number) => {
+export const calculateInvoiceTotal = (invoice: InvoiceSchema, getItemById: (id: string) => ItemSchema | undefined) => {
+  invoiceSchema.parse(invoice);
+
+  const itemEntries = invoice.items.map((item) => ({ item: getItemById(item.itemId), quantity: item.quantity }));
+  const itemsValue = itemEntries.reduce((acc, item) => acc + calculateItemSubtotal(item.item, item.quantity), 0);
+
+  const taxAdjustments = invoice.taxes
+    .map((adjustment) => calculateAdjustment(itemsValue, adjustment, 'positive'))
+    .reduce((acc, adjustment) => (acc || 0) + (adjustment || 0), 0)!;
+
+  const discountAdjustments = invoice.discounts
+    .map((adjustment) => calculateAdjustment(itemsValue, adjustment, 'negative'))
+    .reduce((acc, adjustment) => (acc || 0) + (adjustment || 0), 0)!;
+
+  return itemsValue + taxAdjustments + discountAdjustments;
+};
+
+export const calculateItemSubtotal = (item?: ItemSchema, quantity?: number) => {
   if (!item || !quantity) return 0;
 
   // validate item
@@ -29,5 +51,5 @@ export const calculateAdjustment = (
     return baseAmount + adjustmentEntry.value * amountMultiplier;
   }
 
-  return baseAmount + baseAmount * adjustmentEntry.value * amountMultiplier;
+  return baseAmount + baseAmount * (adjustmentEntry.value / 100) * amountMultiplier;
 };
