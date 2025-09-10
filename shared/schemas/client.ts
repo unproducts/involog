@@ -19,11 +19,11 @@ const clientFields = {
     .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.')
     .optional(),
   isArchived: z.boolean().optional(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
 };
 export const clientSchema = z.object({
   id: z.string().uuid(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
   ...clientFields,
 });
 export type ClientSchema = z.infer<typeof clientSchema>;
