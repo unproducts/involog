@@ -21,8 +21,8 @@ export class ClientServiceImpl implements ClientService {
     const client = {
       ...createClientArgs,
       id: uuid(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     this.clients.value.push(client);
   }
@@ -56,7 +56,7 @@ export class ClientServiceImpl implements ClientService {
       throw new Error('Client not found');
     }
     client.isArchived = true;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
     return client;
   }
 
@@ -66,7 +66,7 @@ export class ClientServiceImpl implements ClientService {
       throw new Error('Client not found');
     }
     client.isArchived = false;
-    client.updatedAt = new Date();
+    client.updatedAt = new Date().toISOString();
     return client;
   }
 }

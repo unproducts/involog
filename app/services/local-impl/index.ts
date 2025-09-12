@@ -8,19 +8,21 @@ import type {
   UnitService,
 } from '~~/lib/api';
 import { ClientServiceImpl } from './client-service';
+import { InvoiceServiceImpl } from './invoice-service';
+import { InvoicePrefixServiceImpl } from './invoice-prefix-service';
 
 export class DataGatewayImpl implements DataGateway {
   private clientService: ClientService;
-  // private invoiceService: InvoiceService;
-  // private invoicePrefixService: InvoicePrefixService;
+  private invoiceService: InvoiceService;
+  private invoicePrefixService: InvoicePrefixService;
   // private itemService: ItemService;
   // private transactionService: TransactionService;
   // private unitService: UnitService;
 
   constructor() {
     this.clientService = new ClientServiceImpl();
-    // this.invoiceService = new InvoiceServiceImpl();
-    // this.invoicePrefixService = new InvoicePrefixServiceImpl();
+    this.invoiceService = new InvoiceServiceImpl();
+    this.invoicePrefixService = new InvoicePrefixServiceImpl();
     // this.itemService = new ItemServiceImpl();
     // this.transactionService = new TransactionServiceImpl();
     // this.unitService = new UnitServiceImpl();

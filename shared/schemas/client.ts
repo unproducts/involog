@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { currencyCodes } from '../consts/currencies';
 import { countryCodes } from '../consts/countries';
+import { supplimentalFields } from './_base';
 
 const clientFields = {
   name: z.string().max(255, 'Name cannot be longer than 255 chars').min(2, 'Name must have atleast 2 chars.'),
@@ -21,9 +22,7 @@ const clientFields = {
   isArchived: z.boolean().optional(),
 };
 export const clientSchema = z.object({
-  id: z.string().uuid(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  ...supplimentalFields,
   ...clientFields,
 });
 export type ClientSchema = z.infer<typeof clientSchema>;
