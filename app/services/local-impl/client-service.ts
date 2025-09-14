@@ -1,13 +1,7 @@
 import { useLocalStorage } from '@vueuse/core';
 import { v4 as uuid } from 'uuid';
 import type { ClientService } from '~~/lib/api';
-import {
-  type CreateClientSchema,
-  type ClientSchema,
-  type UpdateClientSchema,
-  createClientSchema,
-  updateClientSchema,
-} from '~~/shared/schemas/client';
+import { type MutateClientSchema, type ClientSchema, mutateClientSchema } from '~~/shared/schemas/client';
 
 export class ClientServiceImpl implements ClientService {
   private clients: Ref<ClientSchema[]>;
@@ -16,8 +10,8 @@ export class ClientServiceImpl implements ClientService {
     this.clients = useLocalStorage('clients', []);
   }
 
-  async create(params: CreateClientSchema): Promise<void> {
-    const createClientArgs = createClientSchema.parse(params);
+  async create(params: MutateClientSchema): Promise<void> {
+    const createClientArgs = mutateClientSchema.parse(params);
     const client = {
       ...createClientArgs,
       id: uuid(),
@@ -35,15 +29,13 @@ export class ClientServiceImpl implements ClientService {
     return this.clients.value.find((c) => c.id === id) || null;
   }
 
-  async update(params: UpdateClientSchema): Promise<void> {
-    const updateClientArgs = updateClientSchema.parse(params);
-    const client = this.clients.value.find((c) => c.id === updateClientArgs.id);
+  async update(id: string, params: MutateClientSchema): Promise<void> {
+    const updateClientArgs = mutateClientSchema.parse(params);
+    const client = this.clients.value.find((c) => c.id === id);
     if (!client) {
       throw new Error('Client not found');
     }
-    this.clients.value = this.clients.value.map((c) =>
-      c.id === updateClientArgs.id ? { ...c, ...updateClientArgs } : c
-    );
+    this.clients.value = this.clients.value.map((c) => (c.id === id ? { ...c, ...updateClientArgs } : c));
   }
 
   async delete(id: string): Promise<void> {

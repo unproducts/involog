@@ -27,13 +27,7 @@ export const clientSchema = z.object({
 });
 export type ClientSchema = z.infer<typeof clientSchema>;
 
-export const createClientSchema = z.object({
+export const mutateClientSchema = z.object({
   ...clientFields,
 });
-export type CreateClientSchema = z.infer<typeof createClientSchema>;
-
-export const updateClientSchema = z.object({
-  id: z.string().uuid(),
-  ...clientFields,
-});
-export type UpdateClientSchema = z.infer<typeof updateClientSchema>;
+export type MutateClientSchema = z.infer<typeof mutateClientSchema>;
