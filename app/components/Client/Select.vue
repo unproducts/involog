@@ -6,7 +6,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { clients } = storeToRefs(useClientsStore());
+const { data: clients } = useQuery(getClientsColada());
 </script>
 
 <template>

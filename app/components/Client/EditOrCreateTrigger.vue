@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { ClientSchema } from '~~/shared/schemas/client';
-import EditOrCreate from './EditOrCreate.vue';
+import type EditOrCreate from './EditOrCreate.vue';
 
 defineProps<{
   client?: ClientSchema;
 }>();
 
-const editForm = ref<null | InstanceType<typeof EditOrCreate>>(null);
+const editForm = ref<InstanceType<typeof EditOrCreate>>();
+const status = ref<DataStateStatus>('pending');
+const loading = ref(false);
 const modalOpen = ref(false);
 
 const save = () => {
@@ -20,6 +22,12 @@ const openModal = () => {
 defineExpose({
   openModal,
 });
+
+watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    modalOpen.value = false;
+  }
+});
 </script>
 
 <template>
@@ -29,13 +37,15 @@ defineExpose({
     </ShadDialogTrigger>
     <ShadDialogContent>
       <ShadDialogHeader>
-        <ShadDialogTitle v-if="client">Update {{ client.name }}</ShadDialogTitle>
-        <ShadDialogTitle v-else>Register Client</ShadDialogTitle>
+        <ShadDialogTitle>{{ client ? 'Update' : 'Register' }} Client</ShadDialogTitle>
+        <ShadDialogDescription sr-only>
+          {{ client ? 'Update' : 'Register' }} {{ client?.name || 'New Client' }}
+        </ShadDialogDescription>
       </ShadDialogHeader>
-      <ClientEditOrCreate :client ref="editForm" />
+      <ClientEditOrCreate :client ref="editForm" v-model:status="status" v-model:loading="loading" />
       <ShadDialogFooter>
-        <ShadButton variant="secondary" @click.prevent="modalOpen = false">Cancel</ShadButton>
-        <ShadButton @click.prevent="save">Save</ShadButton>
+        <ShadButton variant="secondary" :disabled="loading" @click.prevent="modalOpen = false">Cancel</ShadButton>
+        <ShadButton @click.prevent="save" :loading="loading">Save</ShadButton>
       </ShadDialogFooter>
     </ShadDialogContent>
   </ShadDialog>

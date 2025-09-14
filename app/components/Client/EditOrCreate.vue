@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
+import { syncRef } from '@vueuse/core';
 import { useForm } from 'vee-validate';
-import { createClientSchema, updateClientSchema, type ClientSchema } from '~~/shared/schemas/client';
+import type { WatchStopHandle } from 'vue';
+import { mutateClientSchema, type ClientSchema } from '~~/shared/schemas/client';
 
 const props = defineProps<{
   client?: ClientSchema;
 }>();
 
+const status = defineModel<DataStateStatus>('status', { default: 'pending' });
+const loading = defineModel<boolean>('loading', { default: true });
+
 const isUpdating = !!props.client;
 
-const formSchema = toTypedSchema(isUpdating ? updateClientSchema : createClientSchema);
+const formSchema = toTypedSchema(mutateClientSchema);
 const form = useForm({
   validationSchema: formSchema,
 });
@@ -18,8 +23,20 @@ if (isUpdating) {
   form.setValues(props.client || {});
 }
 
+const { stopHandles } = useStopHandles();
+
 const submit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values);
+  if (isUpdating) {
+    const { mutate, status: updateStatus, isLoading } = useUpdateClientMutation({ id: props.client?.id });
+    mutate(values);
+    stopHandles.push(syncRef(status, updateStatus, { direction: 'rtl' }));
+    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+  } else {
+    const { mutate, status: createStatus, isLoading } = useCreateClientMutation();
+    mutate(values);
+    stopHandles.push(syncRef(status, createStatus, { direction: 'rtl' }));
+    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+  }
 });
 
 defineExpose({ submit });

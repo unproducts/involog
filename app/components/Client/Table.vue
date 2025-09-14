@@ -16,7 +16,8 @@ import DropdownAction from './EditDropdown.vue';
 import type { ClientSchema } from '~~/shared/schemas/client';
 import { countryDetailsMap } from '~~/shared/consts/countries';
 
-const { clients } = storeToRefs(useClientsStore());
+const { data: clientsData } = useQuery(getClientsColada());
+const clients = computed(() => clientsData.value || []);
 
 const columns: ColumnDef<ClientSchema>[] = [
   {
@@ -88,11 +89,11 @@ const expanded = ref<ExpandedState>({});
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedClients = computed(
-  () => Object.keys(rowSelection.value).map((index) => clients.value[Number(index)]) || []
+  () => Object.keys(rowSelection.value).map((index) => clients.value?.[Number(index)]) || []
 ) as ComputedRef<ClientSchema[]>;
 
 const table = useVueTable({
-  data: clients.value,
+  data: clients,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -158,7 +159,7 @@ const table = useVueTable({
       </ShadDropdownMenu>
       <ClientEditDropdownBulk :clients="selectedClients" v-if="showBulkActions" />
       <ClientEditOrCreateTrigger v-else>
-        <ShadButton as="span"> New Client </ShadButton>
+        <ShadButton> New Client </ShadButton>
       </ClientEditOrCreateTrigger>
     </div>
     <div class="rounded-md border w-full overflow-auto">
