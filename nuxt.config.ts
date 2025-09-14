@@ -13,8 +13,8 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/tailwindcss',
-    'shadcn-nuxt',
-    '@nuxtjs/google-fonts' /**, '@nuxtjs/html-validator' */,
+    '@nuxtjs/google-fonts',
+    './app/modules/shad-corrector', // 'shadcn-nuxt' // TODO: remove this once shadcn-nuxt is released further.
     '@pinia/nuxt',
   ],
   pinia: {

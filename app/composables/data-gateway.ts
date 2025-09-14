@@ -1,4 +1,12 @@
+import { DataGatewayImpl } from '~/services/local-impl';
 import type { DataGateway } from '~~/lib/api';
 
-// @ts-expect-error
-export function useDataGatewayService(): { dataGateway: DataGateway } {}
+export async function useDataGateway(): Promise<DataGateway> {
+  const dataGatewayConfig = useAppConfig().dataGateway;
+
+  if (dataGatewayConfig.implementation === 'local') {
+    return new DataGatewayImpl();
+  }
+
+  throw new Error('Data gateway implementation not found');
+}
