@@ -7,7 +7,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { items } = storeToRefs(useItemsStore());
+const { data: items } = useQuery(getItemsColada());
 </script>
 
 <template>

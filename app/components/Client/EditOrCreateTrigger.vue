@@ -11,18 +11,6 @@ const status = ref<DataStateStatus>('pending');
 const loading = ref(false);
 const modalOpen = ref(false);
 
-const save = () => {
-  editForm.value?.submit();
-};
-
-const openModal = () => {
-  modalOpen.value = true;
-};
-
-defineExpose({
-  openModal,
-});
-
 watch(status, (newStatus) => {
   if (newStatus === 'success') {
     modalOpen.value = false;
@@ -45,7 +33,7 @@ watch(status, (newStatus) => {
       <ClientEditOrCreate :client ref="editForm" v-model:status="status" v-model:loading="loading" />
       <ShadDialogFooter>
         <ShadButton variant="secondary" :disabled="loading" @click.prevent="modalOpen = false">Cancel</ShadButton>
-        <ShadButton @click.prevent="save" :loading="loading">Save</ShadButton>
+        <ShadButton @click.prevent="editForm?.submit()" :loading="loading">Save</ShadButton>
       </ShadDialogFooter>
     </ShadDialogContent>
   </ShadDialog>

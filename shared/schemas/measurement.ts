@@ -19,13 +19,7 @@ export const unitSchema = z.object({
 });
 export type UnitSchema = z.infer<typeof unitSchema>;
 
-export const createUnitSchema = z.object({
+export const mutateUnitSchema = z.object({
   ...unitFields,
 });
-export type CreateUnitSchema = z.infer<typeof createUnitSchema>;
-
-export const updateUnitSchema = z.object({
-  id: supplimentalFields.id,
-  ...unitFields,
-});
-export type UpdateUnitSchema = z.infer<typeof updateUnitSchema>;
+export type MutateUnitSchema = z.infer<typeof mutateUnitSchema>;

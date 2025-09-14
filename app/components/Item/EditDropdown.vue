@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { MoreHorizontal, Edit3 } from 'lucide-vue-next';
-import type { Item } from '~~/shared/schemas/item';
+import type { ItemSchema } from '~~/shared/schemas/item';
 
-defineProps<{
-  item: Item;
+const props = defineProps<{
+  item: ItemSchema;
 }>();
+
+const { mutate: deleteItem } = useDeleteItemMutation({ id: props.item.id });
 </script>
 
 <template>
@@ -26,7 +28,7 @@ defineProps<{
         <ShadDropdownMenuLabel>Actions</ShadDropdownMenuLabel>
         <ShadDropdownMenuItem> View Invoices </ShadDropdownMenuItem>
         <ShadDropdownMenuItem> Archive </ShadDropdownMenuItem>
-        <ShadDropdownMenuItem class="text-rose-400"> Delete </ShadDropdownMenuItem>
+        <ShadDropdownMenuItem class="text-red-600" @click="deleteItem"> Delete </ShadDropdownMenuItem>
       </ShadDropdownMenuContent>
     </ShadDropdownMenu>
   </div>

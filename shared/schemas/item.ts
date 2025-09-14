@@ -19,13 +19,7 @@ export const itemSchema = z.object({
 });
 export type ItemSchema = z.infer<typeof itemSchema>;
 
-export const createItemSchema = z.object({
+export const mutateItemSchema = z.object({
   ...itemFields,
 });
-export type CreateItemSchema = z.infer<typeof createItemSchema>;
-
-export const updateItemSchema = z.object({
-  id: supplimentalFields.id,
-  ...itemFields,
-});
-export type UpdateItemSchema = z.infer<typeof updateItemSchema>;
+export type MutateItemSchema = z.infer<typeof mutateItemSchema>;

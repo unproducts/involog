@@ -2,9 +2,16 @@
 import { ChevronDown } from 'lucide-vue-next';
 import type { ItemSchema } from '~~/shared/schemas/item';
 
-defineProps<{
+const props = defineProps<{
   items: ItemSchema[];
 }>();
+
+const deleteItems = () => {
+  props.items.forEach((item) => {
+    const { mutate } = useDeleteItemMutation({ id: item.id });
+    mutate();
+  });
+};
 </script>
 
 <template>
@@ -16,7 +23,9 @@ defineProps<{
       <ShadDropdownMenuLabel>Actions</ShadDropdownMenuLabel>
       <ShadDropdownMenuItem> View Invoices </ShadDropdownMenuItem>
       <ShadDropdownMenuItem> Archive All </ShadDropdownMenuItem>
-      <ShadDropdownMenuItem class="text-rose-400"> Delete All </ShadDropdownMenuItem>
+      <ShadDropdownMenuItem class="text-red-600" @click="deleteItems">
+        Delete Selected ({{ items.length }})
+      </ShadDropdownMenuItem>
     </ShadDropdownMenuContent>
   </ShadDropdownMenu>
 </template>

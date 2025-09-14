@@ -15,7 +15,8 @@ import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
 import type { ItemSchema } from '~~/shared/schemas/item';
 
-const { items } = storeToRefs(useItemsStore());
+const { data: itemsData } = useQuery(getItemsColada());
+const items = computed(() => itemsData.value || []);
 
 const columns: ColumnDef<ItemSchema>[] = [
   {
@@ -108,7 +109,7 @@ const selectedItems = computed(
 ) as ComputedRef<ItemSchema[]>;
 
 const table = useVueTable({
-  data: items.value,
+  data: items,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -142,39 +143,41 @@ const table = useVueTable({
 
 <template>
   <div class="w-full">
-    <div class="flex items-center pb-4">
-      <ShadInput
-        class="max-w-sm"
-        placeholder="Filter items..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
-      />
-      <ShadDropdownMenu>
-        <ShadDropdownMenuTrigger as-child>
-          <ShadButton variant="ghost" class="w-8 h-8 p-0 ml-2">
-            <span class="sr-only">Open menu</span>
-            <MoreVertical class="w-4 h-4" />
-          </ShadButton>
-        </ShadDropdownMenuTrigger>
-        <ShadDropdownMenuContent align="end">
-          <ShadDropdownMenuCheckboxItem
-            v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
-            :key="column.id"
-            class="capitalize"
-            :model-value="column.getIsVisible()"
-            @update:model-value="
-              (value) => {
-                column.toggleVisibility(!!value);
-              }
-            "
-          >
-            {{ column.id }}
-          </ShadDropdownMenuCheckboxItem>
-        </ShadDropdownMenuContent>
-      </ShadDropdownMenu>
+    <div class="flex items-center justify-between pb-4">
+      <div class="flex items-center w-full gap-2">
+        <ShadInput
+          class="max-w-sm"
+          placeholder="Filter items..."
+          :model-value="table.getColumn('name')?.getFilterValue() as string"
+          @update:model-value="table.getColumn('name')?.setFilterValue($event)"
+        />
+        <ShadDropdownMenu>
+          <ShadDropdownMenuTrigger as-child>
+            <ShadButton variant="ghost" class="w-8 h-8 p-0 ml-2">
+              <span class="sr-only">Open menu</span>
+              <MoreVertical class="w-4 h-4" />
+            </ShadButton>
+          </ShadDropdownMenuTrigger>
+          <ShadDropdownMenuContent align="end">
+            <ShadDropdownMenuCheckboxItem
+              v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
+              :key="column.id"
+              class="capitalize"
+              :model-value="column.getIsVisible()"
+              @update:model-value="
+                (value) => {
+                  column.toggleVisibility(!!value);
+                }
+              "
+            >
+              {{ column.id }}
+            </ShadDropdownMenuCheckboxItem>
+          </ShadDropdownMenuContent>
+        </ShadDropdownMenu>
+      </div>
       <ItemEditDropdownBulk :items="selectedItems" v-if="showBulkActions" />
       <ItemEditOrCreateTrigger v-else>
-        <ShadButton as="span"> New Item </ShadButton>
+        <ShadButton> New Item </ShadButton>
       </ItemEditOrCreateTrigger>
     </div>
     <div class="rounded-md border w-full overflow-auto">

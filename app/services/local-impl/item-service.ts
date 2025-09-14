@@ -1,13 +1,7 @@
 import { useLocalStorage } from '@vueuse/core';
 import { v4 as uuid } from 'uuid';
 import type { ItemService } from '~~/lib/api';
-import {
-  type CreateItemSchema,
-  type ItemSchema,
-  type UpdateItemSchema,
-  createItemSchema,
-  updateItemSchema,
-} from '~~/shared/schemas/item';
+import { type MutateItemSchema, type ItemSchema, mutateItemSchema } from '~~/shared/schemas/item';
 
 export class ItemServiceImpl implements ItemService {
   private items: Ref<ItemSchema[]>;
@@ -16,8 +10,8 @@ export class ItemServiceImpl implements ItemService {
     this.items = useLocalStorage('items', []);
   }
 
-  async create(params: CreateItemSchema): Promise<void> {
-    const createItemArgs = createItemSchema.parse(params);
+  async create(params: MutateItemSchema): Promise<void> {
+    const createItemArgs = mutateItemSchema.parse(params);
     const item = {
       ...createItemArgs,
       id: uuid(),
@@ -35,14 +29,14 @@ export class ItemServiceImpl implements ItemService {
     return this.items.value.find((item) => item.id === id) || null;
   }
 
-  async update(params: UpdateItemSchema): Promise<void> {
-    const updateItemArgs = updateItemSchema.parse(params);
-    const item = this.items.value.find((item) => item.id === updateItemArgs.id);
+  async update(id: string, params: MutateItemSchema): Promise<void> {
+    const updateItemArgs = mutateItemSchema.parse(params);
+    const item = this.items.value.find((item) => item.id === id);
     if (!item) {
       throw new Error('Item not found');
     }
     this.items.value = this.items.value.map((item) =>
-      item.id === updateItemArgs.id ? { ...item, ...updateItemArgs, updatedAt: new Date().toISOString() } : item
+      item.id === id ? { ...item, ...updateItemArgs, updatedAt: new Date().toISOString() } : item
     );
   }
 

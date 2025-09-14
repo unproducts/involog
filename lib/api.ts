@@ -9,7 +9,7 @@ import type {
   UpdateInvoicePrefixSchema,
 } from '~~/shared/schemas/invoice';
 
-import type { ItemSchema, CreateItemSchema, UpdateItemSchema } from '~~/shared/schemas/item';
+import type { ItemSchema, MutateItemSchema } from '~~/shared/schemas/item';
 
 import type {
   TransactionSchema,
@@ -19,7 +19,7 @@ import type {
   UpdateIncomeTransactionSchema,
 } from '~~/shared/schemas/transaction';
 
-import type { UnitSchema, CreateUnitSchema, UpdateUnitSchema } from '~~/shared/schemas/measurement';
+import type { UnitSchema, MutateUnitSchema } from '~~/shared/schemas/measurement';
 
 export interface ClientService {
   create(params: MutateClientSchema): Promise<void>;
@@ -48,10 +48,10 @@ export interface InvoicePrefixService {
 }
 
 export interface ItemService {
-  create(params: CreateItemSchema): Promise<void>;
+  create(params: MutateItemSchema): Promise<void>;
   fetch(): Promise<ItemSchema[]>;
   fetchById(id: string): Promise<ItemSchema | null>;
-  update(params: UpdateItemSchema): Promise<void>;
+  update(id: string, params: MutateItemSchema): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
@@ -68,12 +68,12 @@ export interface TransactionService {
 }
 
 export interface UnitService {
-  create(params: CreateUnitSchema): Promise<void>;
+  create(params: MutateUnitSchema): Promise<void>;
   fetch(): Promise<UnitSchema[]>;
   fetchById(id: string): Promise<UnitSchema | null>;
   fetchBySymbolSingular(symbol: string): Promise<UnitSchema | null>;
   fetchBySymbolPlural(symbol: string): Promise<UnitSchema | null>;
-  update(params: UpdateUnitSchema): Promise<void>;
+  update(id: string, params: MutateUnitSchema): Promise<void>;
   delete(id: string): Promise<void>;
 }
 
