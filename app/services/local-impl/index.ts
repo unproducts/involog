@@ -10,40 +10,43 @@ import type {
 import { ClientServiceImpl } from './client-service';
 import { InvoiceServiceImpl } from './invoice-service';
 import { InvoicePrefixServiceImpl } from './invoice-prefix-service';
+import { ItemServiceImpl } from './item-service';
+import { TransactionServiceImpl } from './transaction-service';
+import { UnitServiceImpl } from './unit-service';
 
 export class DataGatewayImpl implements DataGateway {
   private clientService: ClientService;
   private invoiceService: InvoiceService;
   private invoicePrefixService: InvoicePrefixService;
-  // private itemService: ItemService;
-  // private transactionService: TransactionService;
-  // private unitService: UnitService;
+  private itemService: ItemService;
+  private transactionService: TransactionService;
+  private unitService: UnitService;
 
   constructor() {
     this.clientService = new ClientServiceImpl();
     this.invoiceService = new InvoiceServiceImpl();
     this.invoicePrefixService = new InvoicePrefixServiceImpl();
-    // this.itemService = new ItemServiceImpl();
-    // this.transactionService = new TransactionServiceImpl();
-    // this.unitService = new UnitServiceImpl();
+    this.itemService = new ItemServiceImpl();
+    this.transactionService = new TransactionServiceImpl();
+    this.unitService = new UnitServiceImpl();
   }
 
   getClientService(): ClientService {
     return this.clientService;
   }
   getInvoiceService(): InvoiceService {
-    throw new Error('Method not implemented.');
+    return this.invoiceService;
   }
   getInvoicePrefixService(): InvoicePrefixService {
-    throw new Error('Method not implemented.');
+    return this.invoicePrefixService;
   }
   getItemService(): ItemService {
-    throw new Error('Method not implemented.');
+    return this.itemService;
   }
   getTransactionService(): TransactionService {
-    throw new Error('Method not implemented.');
+    return this.transactionService;
   }
   getUnitService(): UnitService {
-    throw new Error('Method not implemented.');
+    return this.unitService;
   }
 }
