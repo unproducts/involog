@@ -11,11 +11,16 @@ export default defineNuxtConfig({
       },
     },
   },
+  ssr: false,
+  imports: {
+    dirs: ['coladas'],
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
     './app/modules/shad-corrector', // 'shadcn-nuxt' // TODO: remove this once shadcn-nuxt is released further.
     '@pinia/nuxt',
+    '@pinia/colada-nuxt',
   ],
   pinia: {
     storesDirs: ['./app/stores'],
