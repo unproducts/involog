@@ -16,7 +16,9 @@ import DropdownAction from './EditDropdown.vue';
 import type { TransactionSchema } from '~~/shared/schemas/transaction';
 import { expenseCategoriesMap, incomeCategoriesMap } from '~~/shared/consts/transactions';
 
-const { transactions } = storeToRefs(useTransactionsStore());
+// const { transactions } = storeToRefs(useTransactionsStore());
+const { data: transactionData } = useQuery(getTransactionColada());
+const transactions = computed(() => transactionData.value || []);
 
 const { findById } = useClientsStore();
 
@@ -178,7 +180,7 @@ const selectedTransactions = computed(
 ) as ComputedRef<TransactionSchema[]>;
 
 const table = useVueTable({
-  data: transactions.value,
+  data: transactions,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
+import { syncRef } from '@vueuse/core';
+import type { WatchStopHandle } from 'vue';
 import { useForm } from 'vee-validate';
 import { type TransactionType } from '~~/shared/consts/transactions';
 import {
@@ -7,6 +9,7 @@ import {
   createIncomeTransactionSchema,
   updateExpenseTransactionSchema,
   updateIncomeTransactionSchema,
+  mutateTransactionSchema,
   type TransactionSchema,
 } from '~~/shared/schemas/transaction';
 
@@ -15,7 +18,12 @@ const props = defineProps<{
   type?: TransactionType;
 }>();
 
+const status = defineModel<DataStateStatus>('status', { default: 'pending' });
+const loading = defineModel<boolean>('loading', { default: true });
+
 const isUpdating = !!props.transaction;
+
+const formSchema = toTypedSchema(mutateTransactionSchema);
 
 if (props.transaction && props.type) {
   if (props.transaction.type !== props.type) {
@@ -35,10 +43,12 @@ const transactionSchema = isUpdating
   ? createIncomeTransactionSchema
   : createExpenseTransactionSchema;
 
-const formSchema = toTypedSchema(transactionSchema);
+// const formSchema = toTypedSchema(transactionSchema);
 const form = useForm({
   validationSchema: formSchema,
 });
+
+const { stopHandles } = useStopHandles();
 
 if (isUpdating) {
   form.setValues(props.transaction || {});
@@ -47,6 +57,18 @@ if (isUpdating) {
 }
 
 const submit = form.handleSubmit((values) => {
+  if (isUpdating) {
+    const { mutate, status: updateStatus, isLoading } = useUpdateTransactionMutation({ id: props.transaction?.id });
+    mutate(values);
+    stopHandles.push(syncRef(status, updateStatus, { direction: 'rtl' }));
+    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+  } else {
+    const { mutate, status: createStatus, isLoading } = useCreateTransactionMutation();
+    mutate(values);
+    stopHandles.push(syncRef(status, createStatus, { direction: 'rtl' }));
+    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+  }
+
   console.log('Form submitted!', values);
 });
 
