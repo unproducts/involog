@@ -12,6 +12,8 @@ import type {
 import type { ItemSchema, MutateItemSchema } from '~~/shared/schemas/item';
 
 import type {
+  MutateTransactionSchema,
+  mutateTransactionSchema,
   TransactionSchema,
   CreateExpenseTransactionSchema,
   CreateIncomeTransactionSchema,
@@ -56,14 +58,18 @@ export interface ItemService {
 }
 
 export interface TransactionService {
-  createExpense(params: CreateExpenseTransactionSchema): Promise<void>;
-  createIncome(params: CreateIncomeTransactionSchema): Promise<void>;
+  create(params: MutateTransactionSchema): Promise<void>;
+  createExpense(params: MutateTransactionSchema): Promise<void>;
+  createIncome(params: MutateTransactionSchema): Promise<void>;
+  update(id: string, params: MutateTransactionSchema): Promise<void>;
+  updateExpense(id: string, params: MutateTransactionSchema): Promise<void>;
+  updateIncome(id: string, params: MutateTransactionSchema): Promise<void>;
+  archive(id: string): Promise<TransactionSchema>;
+  unarchive(id: string): Promise<TransactionSchema>;
   fetch(): Promise<TransactionSchema[]>;
   fetchById(id: string): Promise<TransactionSchema | null>;
   fetchByType(type: 'I' | 'E'): Promise<TransactionSchema[]>;
   fetchByClient(clientId: string): Promise<TransactionSchema[]>;
-  updateExpense(params: UpdateExpenseTransactionSchema): Promise<void>;
-  updateIncome(params: UpdateIncomeTransactionSchema): Promise<void>;
   delete(id: string): Promise<void>;
 }
 

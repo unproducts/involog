@@ -14,6 +14,9 @@ const transactionFields = {
   currency: z
     .string()
     .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.'),
+  category:z
+    .string()
+    .refine((c) => incomeCategories, 'Invalid currency code. Must be a valid ISO 3166 three-letter code.'),
   date: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'), // date string, YYYY-MM-DD
   type: transactionTypeSchema,
   merchant: z.string().max(255, 'Merchant name cannot be longer than 255 chars').optional(),
@@ -80,3 +83,8 @@ export type UpdateIncomeTransactionSchema = z.infer<typeof updateIncomeTransacti
 
 export const transactionSchema = z.union([expenseTransactionSchema, incomeTransactionSchema]);
 export type TransactionSchema = z.infer<typeof transactionSchema>;
+
+export const mutateTransactionSchema = z.object({
+  ...transactionFields,
+});
+export type MutateTransactionSchema = z.infer<typeof mutateTransactionSchema>;
