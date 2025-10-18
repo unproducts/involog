@@ -4,6 +4,7 @@ import type { TransactionService } from '~~/lib/api';
 import {
   type CreateExpenseTransactionSchema,
   type CreateIncomeTransactionSchema,
+  type MutateTransactionSchema,
   type TransactionSchema,
   type UpdateExpenseTransactionSchema,
   type UpdateIncomeTransactionSchema,
@@ -11,6 +12,7 @@ import {
   createIncomeTransactionSchema,
   updateExpenseTransactionSchema,
   updateIncomeTransactionSchema,
+  mutateTransactionSchema,
 } from '~~/shared/schemas/transaction';
 
 export class TransactionServiceImpl implements TransactionService {
@@ -19,9 +21,29 @@ export class TransactionServiceImpl implements TransactionService {
   constructor() {
     this.transactions = useLocalStorage('transactions', []);
   }
+   async create(params: MutateTransactionSchema): Promise<void> {
+    const createIncomeArgs = createIncomeTransactionSchema.parse(params);
+    const transaction = {
+      ...createIncomeArgs,
+      type: 'I' as const,
+      id: uuid(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.transactions.value.push(transaction);
+  }
+  update(id: string, params: MutateTransactionSchema): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  archive(id: string): Promise<TransactionSchema> {
+    throw new Error('Method not implemented.');
+  }
+  unarchive(id: string): Promise<TransactionSchema> {
+    throw new Error('Method not implemented.');
+  }
 
-  async createExpense(params: CreateExpenseTransactionSchema): Promise<void> {
-    const createExpenseArgs = createExpenseTransactionSchema.parse(params);
+  async createExpense(params: MutateTransactionSchema): Promise<void> {
+    const createExpenseArgs = mutateTransactionSchema.parse(params);
     const transaction = {
       ...createExpenseArgs,
       type: 'E' as const,
@@ -32,8 +54,8 @@ export class TransactionServiceImpl implements TransactionService {
     this.transactions.value.push(transaction);
   }
 
-  async createIncome(params: CreateIncomeTransactionSchema): Promise<void> {
-    const createIncomeArgs = createIncomeTransactionSchema.parse(params);
+  async createIncome(params: MutateTransactionSchema): Promise<void> {
+    const createIncomeArgs = mutateTransactionSchema.parse(params);
     const transaction = {
       ...createIncomeArgs,
       type: 'I' as const,
@@ -60,32 +82,29 @@ export class TransactionServiceImpl implements TransactionService {
     return this.transactions.value.filter((transaction) => transaction.clientId === clientId);
   }
 
-  async updateExpense(params: UpdateExpenseTransactionSchema): Promise<void> {
-    const updateExpenseArgs = updateExpenseTransactionSchema.parse(params);
-    const transaction = this.transactions.value.find((t) => t.id === updateExpenseArgs.id);
+  async updateExpense(id : string ,params: MutateTransactionSchema): Promise<void> {
+    const updateExpenseArgs = mutateTransactionSchema.parse(params);
+    const transaction = this.transactions.value.find((c) => c.id === id);
     if (!transaction) {
       throw new Error('Transaction not found');
     }
     if (transaction.type !== 'E') {
-      throw new Error('Transaction is not an expense transaction');
+      throw new Error('Transaction is not an income transaction');
     }
-    this.transactions.value = this.transactions.value.map((t) =>
-      t.id === updateExpenseArgs.id ? { ...t, ...updateExpenseArgs, updatedAt: new Date().toISOString() } : t
-    );
+    this.transactions.value = this.transactions.value.map((c) => (c.id === id ? { ...c, ...updateExpenseArgs } : c));
   }
 
-  async updateIncome(params: UpdateIncomeTransactionSchema): Promise<void> {
-    const updateIncomeArgs = updateIncomeTransactionSchema.parse(params);
-    const transaction = this.transactions.value.find((t) => t.id === updateIncomeArgs.id);
+  async updateIncome(id : string , params: MutateTransactionSchema): Promise<void> {
+    const updateExpenseArgs = mutateTransactionSchema.parse(params);
+    const transaction = this.transactions.value.find((c) => c.id === id);
     if (!transaction) {
       throw new Error('Transaction not found');
     }
     if (transaction.type !== 'I') {
       throw new Error('Transaction is not an income transaction');
     }
-    this.transactions.value = this.transactions.value.map((t) =>
-      t.id === updateIncomeArgs.id ? { ...t, ...updateIncomeArgs, updatedAt: new Date().toISOString() } : t
-    );
+    this.transactions.value = this.transactions.value.map((c) => (c.id === id ? { ...c, ...updateExpenseArgs } : c));
+
   }
 
   async delete(id: string): Promise<void> {

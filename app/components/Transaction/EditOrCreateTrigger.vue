@@ -9,7 +9,15 @@ defineProps<{
 }>();
 
 const editForm = ref<null | InstanceType<typeof EditOrCreate>>(null);
+const status = ref<DataStateStatus>('pending');
+const loading = ref(false);
 const modalOpen = ref(false);
+
+watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    modalOpen.value = false;
+  }
+});
 
 const save = () => {
   editForm.value?.submit();
@@ -34,7 +42,7 @@ defineExpose({
         <ShadDialogTitle v-if="transaction">Update Transaction</ShadDialogTitle>
         <ShadDialogTitle v-else>New {{ type == 'I' ? 'Income' : 'Expense' }}</ShadDialogTitle>
       </ShadDialogHeader>
-      <TransactionEditOrCreate :transaction :type ref="editForm" />
+      <TransactionEditOrCreate :transaction :type ref="editForm" v-model:status="status" v-model:loading="loading" />
       <ShadDialogFooter>
         <ShadButton variant="secondary" @click.prevent="modalOpen = false">Cancel</ShadButton>
         <ShadButton @click.prevent="save">Save</ShadButton>
