@@ -1,10 +1,19 @@
 import { z } from 'zod';
+import { currencyCodes } from '../consts/currencies';
+import { countryCodes } from '../consts/countries';
 
 export const supplimentalFields = {
   id: z.string().uuid(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 } as const;
+
+export const currencyCodeSchema = z
+  .string()
+  .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.');
+export const countryCodeSchema = z
+  .string()
+  .refine((c) => countryCodes.includes(c), 'Invalid country code. Must be a valid ISO 4217 three-letter code.');
 
 export const FilterSets = {
   discreteValues: (refinement: z.ZodType<string> = z.string()) => z.array(refinement),

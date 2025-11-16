@@ -1,17 +1,13 @@
 import { z } from 'zod';
-import { currencyCodes } from '../consts/currencies';
-import { countryCodes } from '../consts/countries';
-import { FilterSets, supplimentalFields, SupplimentalFieldsFilterSet } from './_base';
+import {
+  countryCodeSchema,
+  currencyCodeSchema,
+  FilterSets,
+  supplimentalFields,
+  SupplimentalFieldsFilterSet,
+} from './_base';
 
-export const countryCodeSchema = z
-  .string()
-  .refine((c) => countryCodes.includes(c), 'Invalid country code. Must be a valid ISO 4217 three-letter code.');
-
-export const currencyCodeSchema = z
-  .string()
-  .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.');
-
-const clientFields = {
+export const clientFields = {
   name: z.string().max(255, 'Name cannot be longer than 255 chars').min(2, 'Name must have atleast 2 chars.'),
   email: z.string().email('Email must be a valid email address').optional(),
   phone: z.string().min(10).max(50).optional(),

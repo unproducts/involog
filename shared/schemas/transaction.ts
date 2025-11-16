@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { currencyCodes } from '../consts/currencies';
 import { transactionCategories, type TransactionCategory } from '../consts/transactions';
 import { isValidDate } from '../utils/general';
-import { FilterSets, supplimentalFields, SupplimentalFieldsFilterSet } from './_base';
+import { currencyCodeSchema, FilterSets, supplimentalFields, SupplimentalFieldsFilterSet } from './_base';
 
 export const transactionTypeSchema = z.enum(['I', 'E']);
 export const transactionCategorySchema = z
@@ -15,9 +14,7 @@ const transactionFields = {
     .max(500, 'Description cannot be longer than 500 chars')
     .min(2, 'Description must have atleast 2 chars.'),
   amount: z.number().min(0, 'Amount must be a positive number'),
-  currency: z
-    .string()
-    .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.'),
+  currency: currencyCodeSchema,
   date: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'), // date string, YYYY-MM-DD
   type: transactionTypeSchema,
   category: transactionCategorySchema.optional(),
