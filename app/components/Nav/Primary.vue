@@ -15,7 +15,7 @@ const route = useRoute();
   <ShadSidebarGroup>
     <ShadSidebarGroupLabel>Menu</ShadSidebarGroupLabel>
     <ShadSidebarMenu>
-      <ShadSidebarMenuItem v-for="item in items" :key="item.name" :is-active="item.url === route.path">
+      <ShadSidebarMenuItem v-for="item in items" :key="item.name" :is-active="route.path.startsWith(item.url)">
         <ShadSidebarMenuButton as-child>
           <NuxtLink :to="item.url">
             <component :is="item.icon" />
