@@ -1,10 +1,18 @@
-import { mutateUnitSchema, type MutateUnitSchema } from '~~/shared/schemas/measurement';
+import {
+  createUnitSchema,
+  updateUnitSchema,
+  deleteUnitSchema,
+  type CreateUnitSchema,
+  type UpdateUnitSchema,
+  type DeleteUnitSchema,
+  type FilterUnitsSchema,
+} from '~~/shared/schemas/unit';
 
-export const getUnitsColada = defineQueryOptions(() => ({
-  key: ['units'],
+export const getUnitsColada = defineQueryOptions((params: FilterUnitsSchema = {}) => ({
+  key: ['units', params],
   query: async () => {
     const dataGateway = await useDataGateway();
-    return dataGateway.getUnitService().fetch();
+    return dataGateway.getUnitService().fetch(params);
   },
   staleTime: DEFAULT_STALE_TIME,
 }));
@@ -18,29 +26,11 @@ export const getUnitByIdColada = defineQueryOptions((params: { id: string }) => 
   staleTime: DEFAULT_STALE_TIME,
 }));
 
-export const getUnitBySymbolSingularColada = defineQueryOptions((params: { symbol: string }) => ({
-  key: ['units', 'singular', params.symbol],
-  query: async () => {
-    const dataGateway = await useDataGateway();
-    return dataGateway.getUnitService().fetchBySymbolSingular(params.symbol);
-  },
-  staleTime: DEFAULT_STALE_TIME,
-}));
-
-export const getUnitBySymbolPluralColada = defineQueryOptions((params: { symbol: string }) => ({
-  key: ['units', 'plural', params.symbol],
-  query: async () => {
-    const dataGateway = await useDataGateway();
-    return dataGateway.getUnitService().fetchBySymbolPlural(params.symbol);
-  },
-  staleTime: DEFAULT_STALE_TIME,
-}));
-
 export const useCreateUnitMutation = () => {
   const { refetch } = useQuery(getUnitsColada());
   return useMutation({
-    async mutation(rawParams: MutateUnitSchema) {
-      const params = mutateUnitSchema.parse(rawParams);
+    async mutation(rawParams: CreateUnitSchema) {
+      const params = createUnitSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getUnitService().create(params);
     },
@@ -53,16 +43,16 @@ export const useCreateUnitMutation = () => {
   });
 };
 
-export const useUpdateUnitMutation = ({ id }: { id: string }) => {
-  const { refetch: refetchUnit } = useQuery(getUnitByIdColada({ id }));
-  const { refetch: refetchUnits } = useQuery(getUnitsColada());
+export const useUpdateUnitMutation = () => {
   return useMutation({
-    async mutation(rawParams: MutateUnitSchema) {
-      const params = mutateUnitSchema.parse(rawParams);
+    async mutation(rawParams: UpdateUnitSchema) {
+      const params = updateUnitSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
-      return dataGateway.getUnitService().update(id, params);
+      return dataGateway.getUnitService().update(params);
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
+      const { refetch: refetchUnit } = useQuery(getUnitByIdColada({ id: vars.id }));
+      const { refetch: refetchUnits } = useQuery(getUnitsColada());
       refetchUnit();
       refetchUnits();
     },
@@ -72,16 +62,15 @@ export const useUpdateUnitMutation = ({ id }: { id: string }) => {
   });
 };
 
-export const useDeleteUnitMutation = (params: { id: string }) => {
-  const { refetch: refetchUnit } = useQuery(getUnitByIdColada(params));
+export const useDeleteUnitMutation = () => {
   const { refetch: refetchUnits } = useQuery(getUnitsColada());
   return useMutation({
-    async mutation() {
+    async mutation(rawParams: DeleteUnitSchema) {
+      const params = deleteUnitSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
-      return dataGateway.getUnitService().delete(params.id);
+      return dataGateway.getUnitService().delete(params);
     },
     onSuccess: () => {
-      refetchUnit();
       refetchUnits();
     },
     onError: (error) => {

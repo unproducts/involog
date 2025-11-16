@@ -36,7 +36,13 @@ import type {
   DeleteTransactionSchema,
 } from '~~/shared/schemas/transaction';
 
-import type { UnitSchema, MutateUnitSchema } from '~~/shared/schemas/measurement';
+import type {
+  UnitSchema,
+  CreateUnitSchema,
+  UpdateUnitSchema,
+  DeleteUnitSchema,
+  FilterUnitsSchema,
+} from '~~/shared/schemas/unit';
 
 export interface ClientService {
   fetch(params: FilterClientsSchema): Promise<ClientSchema[]>;
@@ -80,13 +86,11 @@ export interface TransactionService {
 }
 
 export interface UnitService {
-  create(params: MutateUnitSchema): Promise<void>;
-  fetch(): Promise<UnitSchema[]>;
+  fetch(params: FilterUnitsSchema): Promise<UnitSchema[]>;
   fetchById(id: string): Promise<UnitSchema | null>;
-  fetchBySymbolSingular(symbol: string): Promise<UnitSchema | null>;
-  fetchBySymbolPlural(symbol: string): Promise<UnitSchema | null>;
-  update(id: string, params: MutateUnitSchema): Promise<void>;
-  delete(id: string): Promise<void>;
+  create(params: CreateUnitSchema): Promise<void>;
+  update(params: UpdateUnitSchema): Promise<void>;
+  delete(params: DeleteUnitSchema): Promise<void>;
 }
 
 export interface DataGateway {

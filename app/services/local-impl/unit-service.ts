@@ -1,7 +1,17 @@
 import { useLocalStorage } from '@vueuse/core';
 import { v4 as uuid } from 'uuid';
 import type { UnitService } from '~~/lib/api';
-import { type MutateUnitSchema, type UnitSchema, mutateUnitSchema } from '~~/shared/schemas/measurement';
+import {
+  type CreateUnitSchema,
+  type UpdateUnitSchema,
+  type DeleteUnitSchema,
+  type FilterUnitsSchema,
+  type UnitSchema,
+  createUnitSchema,
+  updateUnitSchema,
+  deleteUnitSchema,
+  filterUnitsSchema,
+} from '~~/shared/schemas/unit';
 
 // Baseline static units that cannot be modified
 const baselineUnits: UnitSchema[] = [
@@ -59,8 +69,8 @@ export class UnitServiceImpl implements UnitService {
     return id.startsWith('baseline-');
   }
 
-  async create(params: MutateUnitSchema): Promise<void> {
-    const createUnitArgs = mutateUnitSchema.parse(params);
+  async create(params: CreateUnitSchema): Promise<void> {
+    const createUnitArgs = createUnitSchema.parse(params);
     const unit = {
       ...createUnitArgs,
       id: uuid(),
@@ -70,58 +80,76 @@ export class UnitServiceImpl implements UnitService {
     this.customUnits.value.push(unit);
   }
 
-  async fetch(): Promise<UnitSchema[]> {
-    // Return baseline units + custom units
-    return [...baselineUnits, ...this.customUnits.value];
+  async fetch(params: FilterUnitsSchema): Promise<UnitSchema[]> {
+    const filterArgs = filterUnitsSchema.parse(params);
+    let all = [...baselineUnits, ...this.customUnits.value];
+
+    if (filterArgs.id && filterArgs.id.length > 0) {
+      all = all.filter((u) => filterArgs.id!.includes(u.id));
+    }
+    if (filterArgs.createdAt) {
+      const { from, to } = filterArgs.createdAt;
+      all = all.filter((u) => {
+        const createdAt = new Date(u.createdAt);
+        if (from && createdAt < new Date(from)) return false;
+        if (to && createdAt > new Date(to)) return false;
+        return true;
+      });
+    }
+    if (filterArgs.updatedAt) {
+      const { from, to } = filterArgs.updatedAt;
+      all = all.filter((u) => {
+        const updatedAt = new Date(u.updatedAt);
+        if (from && updatedAt < new Date(from)) return false;
+        if (to && updatedAt > new Date(to)) return false;
+        return true;
+      });
+    }
+    if (filterArgs.name) {
+      const term = filterArgs.name.toLowerCase();
+      all = all.filter((u) => u.name.toLowerCase().includes(term));
+    }
+    if (filterArgs.symbolSingular && filterArgs.symbolSingular.length > 0) {
+      all = all.filter((u) => filterArgs.symbolSingular!.includes(u.symbolSingular));
+    }
+    if (filterArgs.symbolPlural && filterArgs.symbolPlural.length > 0) {
+      all = all.filter((u) => filterArgs.symbolPlural!.includes(u.symbolPlural));
+    }
+
+    return all;
   }
 
   async fetchById(id: string): Promise<UnitSchema | null> {
-    // Check baseline units first, then custom units
     const baselineUnit = baselineUnits.find((unit) => unit.id === id);
     if (baselineUnit) return baselineUnit;
 
     return this.customUnits.value.find((unit) => unit.id === id) || null;
   }
 
-  async fetchBySymbolSingular(symbol: string): Promise<UnitSchema | null> {
-    // Check baseline units first, then custom units
-    const baselineUnit = baselineUnits.find((unit) => unit.symbolSingular === symbol);
-    if (baselineUnit) return baselineUnit;
-
-    return this.customUnits.value.find((unit) => unit.symbolSingular === symbol) || null;
-  }
-
-  async fetchBySymbolPlural(symbol: string): Promise<UnitSchema | null> {
-    // Check baseline units first, then custom units
-    const baselineUnit = baselineUnits.find((unit) => unit.symbolPlural === symbol);
-    if (baselineUnit) return baselineUnit;
-
-    return this.customUnits.value.find((unit) => unit.symbolPlural === symbol) || null;
-  }
-
-  async update(id: string, params: MutateUnitSchema): Promise<void> {
+  async update(params: UpdateUnitSchema): Promise<void> {
     // Prevent updating baseline units
-    if (this.isBaselineUnit(id)) {
+    if (this.isBaselineUnit(params.id)) {
       throw new Error('Cannot update baseline units');
     }
 
-    const updateUnitArgs = mutateUnitSchema.parse(params);
-    const unit = this.customUnits.value.find((unit) => unit.id === id);
+    const updateUnitArgs = updateUnitSchema.parse(params);
+    const unit = this.customUnits.value.find((unit) => unit.id === updateUnitArgs.id);
     if (!unit) {
       throw new Error('Custom unit not found');
     }
 
     this.customUnits.value = this.customUnits.value.map((unit) =>
-      unit.id === id ? { ...unit, ...updateUnitArgs, updatedAt: new Date().toISOString() } : unit
+      unit.id === updateUnitArgs.id ? { ...unit, ...updateUnitArgs, updatedAt: new Date().toISOString() } : unit
     );
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(params: DeleteUnitSchema): Promise<void> {
     // Prevent deleting baseline units
-    if (this.isBaselineUnit(id)) {
+    if (this.isBaselineUnit(params.id)) {
       throw new Error('Cannot delete baseline units');
     }
 
-    this.customUnits.value = this.customUnits.value.filter((unit) => unit.id !== id);
+    const deleteArgs = deleteUnitSchema.parse(params);
+    this.customUnits.value = this.customUnits.value.filter((unit) => unit.id !== deleteArgs.id);
   }
 }
