@@ -65,7 +65,6 @@ function filterItems() {
       // If value is null, it means it's a special item that should always be shown,
       // except if exact same item exists;
       // score = !allItems.value.values().some((v) => v === filterState.search);
-      console.log('Item with id:', id, 'is null', filterState.search, !!filterState.search);
       score = !!filterState.search;
     } else {
       score = contains(value, filterState.search);
