@@ -1,10 +1,17 @@
-import { mutateItemSchema, type MutateItemSchema } from '~~/shared/schemas/item';
+import {
+  createItemSchema,
+  deleteItemSchema,
+  updateItemSchema,
+  type CreateItemSchema,
+  type DeleteItemSchema,
+  type UpdateItemSchema,
+} from '~~/shared/schemas/item';
 
 export const getItemsColada = defineQueryOptions(() => ({
   key: ['items'],
   query: async () => {
     const dataGateway = await useDataGateway();
-    return dataGateway.getItemService().fetch();
+    return dataGateway.getItemService().fetch({});
   },
   staleTime: DEFAULT_STALE_TIME,
 }));
@@ -21,8 +28,8 @@ export const getItemByIdColada = defineQueryOptions((params: { id: string }) => 
 export const useCreateItemMutation = () => {
   const { refetch } = useQuery(getItemsColada());
   return useMutation({
-    async mutation(rawParams: MutateItemSchema) {
-      const params = mutateItemSchema.parse(rawParams);
+    async mutation(rawParams: CreateItemSchema) {
+      const params = createItemSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getItemService().create(params);
     },
@@ -35,16 +42,16 @@ export const useCreateItemMutation = () => {
   });
 };
 
-export const useUpdateItemMutation = ({ id }: { id: string }) => {
-  const { refetch: refetchItem } = useQuery(getItemByIdColada({ id }));
-  const { refetch: refetchItems } = useQuery(getItemsColada());
+export const useUpdateItemMutation = () => {
   return useMutation({
-    async mutation(rawParams: MutateItemSchema) {
-      const params = mutateItemSchema.parse(rawParams);
+    async mutation(rawParams: UpdateItemSchema) {
+      const params = updateItemSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
-      return dataGateway.getItemService().update(id, params);
+      return dataGateway.getItemService().update(params);
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
+      const { refetch: refetchItem } = useQuery(getItemByIdColada({ id: vars.id }));
+      const { refetch: refetchItems } = useQuery(getItemsColada());
       refetchItem();
       refetchItems();
     },
@@ -54,16 +61,15 @@ export const useUpdateItemMutation = ({ id }: { id: string }) => {
   });
 };
 
-export const useDeleteItemMutation = (params: { id: string }) => {
-  const { refetch: refetchItem } = useQuery(getItemByIdColada(params));
+export const useDeleteItemMutation = () => {
   const { refetch: refetchItems } = useQuery(getItemsColada());
   return useMutation({
-    async mutation() {
+    async mutation(rawParams: DeleteItemSchema) {
+      const params = deleteItemSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
-      return dataGateway.getItemService().delete(params.id);
+      return dataGateway.getItemService().delete(params);
     },
     onSuccess: () => {
-      refetchItem();
       refetchItems();
     },
     onError: (error) => {
