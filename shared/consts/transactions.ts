@@ -1,11 +1,9 @@
-export const expenseCategoriesMap = {
+export const transactionCategoriesMap = {
   ADV: 'Advertising',
   BIL: 'Bills',
   CAR: 'Car',
-  CON: 'Consulting',
   ENT: 'Entertainment',
   EQU: 'Equipment',
-  FEE: 'Fees',
   INS: 'Insurance',
   LAB: 'Labor',
   OFF: 'Office',
@@ -16,37 +14,21 @@ export const expenseCategoriesMap = {
   TRV: 'Travel',
   UTL: 'Utilities',
   OTH: 'Other',
-} as const;
-
-export type ExpenseCategory = keyof typeof expenseCategoriesMap;
-export const expenseCategories = Object.keys(expenseCategoriesMap) as ExpenseCategory[];
-expenseCategories.sort();
-
-export const expenseCategoryDetails = expenseCategories.map((code) => ({
-  category: expenseCategoriesMap[code as ExpenseCategory],
-  code: code as ExpenseCategory,
-}));
-
-export const incomeCategoriesMap = {
   CON: 'Consulting',
   FEE: 'Fees',
   INT: 'Interest',
   INV: 'Investment',
-  LAB: 'Labor',
   LOA: 'Loan',
-  SAL: 'Salary',
-  SFT: 'Software',
   SLE: 'Sale',
-  OTH: 'Other',
 } as const;
 
-export type IncomeCategory = keyof typeof incomeCategoriesMap;
-export const incomeCategories = Object.keys(incomeCategoriesMap) as IncomeCategory[];
-incomeCategories.sort();
+export type TransactionCategory = keyof typeof transactionCategoriesMap;
+export const transactionCategories = Object.keys(transactionCategoriesMap) as TransactionCategory[];
+transactionCategories.sort();
 
-export const incomeCategoryDetails = incomeCategories.map((code) => ({
-  category: incomeCategoriesMap[code as IncomeCategory],
-  code: code as IncomeCategory,
+export const transactionCategoryDetails = transactionCategories.map((code) => ({
+  category: transactionCategoriesMap[code as TransactionCategory],
+  code: code as TransactionCategory,
 }));
 
 export const TransactionTypes = {

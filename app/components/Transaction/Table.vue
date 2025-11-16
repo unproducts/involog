@@ -10,15 +10,14 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, User2 } from 'lucide-vue-next';
-import { ShadBadge, ShadButton, ShadCheckbox } from '#components';
+import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft } from 'lucide-vue-next';
+import { ShadBadge, ShadButton, ShadCheckbox, ClientCell, RawAmountCell } from '#components';
 import DropdownAction from './EditDropdown.vue';
 import type { TransactionSchema } from '~~/shared/schemas/transaction';
-import { expenseCategoriesMap, incomeCategoriesMap } from '~~/shared/consts/transactions';
+import { transactionCategoriesMap, type TransactionCategory } from '~~/shared/consts/transactions';
 
-const { transactions } = storeToRefs(useTransactionsStore());
-
-const { findById } = useClientsStore();
+const { data: transactionsData } = useQuery(getTransactionsColada());
+const transactions = computed(() => transactionsData.value || []);
 
 const columns: ColumnDef<TransactionSchema>[] = [
   {
@@ -57,21 +56,8 @@ const columns: ColumnDef<TransactionSchema>[] = [
     accessorKey: 'merchant-client',
     header: () => h('div', { class: 'capitalize' }, 'Merchant/Client'),
     cell: ({ row }) => {
-      // let displayValue = row.original.merchant;
       if (row.original.clientId) {
-        const client = findById(row.original.clientId);
-        return client
-          ? h(
-              ShadButton,
-              {
-                variant: 'ghost',
-                class: '-ml-4',
-                // TODO: implement this.
-                // onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-              },
-              () => [h(User2, { class: 'h-4 w-4' }), client.name]
-            )
-          : h('div', { class: 'italic' }, 'Unknown Client');
+        return h(ClientCell, { clientId: row.original.clientId, showIcon: true });
       } else if (row.original.merchant) {
         return h('div', { class: 'capitalize' }, row.original.merchant);
       }
@@ -113,10 +99,8 @@ const columns: ColumnDef<TransactionSchema>[] = [
       );
     },
     cell: ({ row }) => {
-      const categoryKey = row.getValue('category') as string;
-      const type = row.getValue('type');
-      // @ts-expect-error categoryKey type
-      const category = type === 'I' ? incomeCategoriesMap[categoryKey] : expenseCategoriesMap[categoryKey];
+      const categoryKey = row.getValue('category') as TransactionCategory;
+      const category = transactionCategoriesMap[categoryKey];
       return h(ShadButton, { variant: 'ghost' }, () => category);
     },
   },
@@ -134,25 +118,11 @@ const columns: ColumnDef<TransactionSchema>[] = [
       );
     },
     cell: ({ row }) => {
-      const type = row.getValue('type') === 'I' ? 'Income' : 'Expense';
-      let amountRaw = row.getValue('amount') as string | number | undefined;
-      if (!amountRaw) {
-        return h('div', { class: 'italic' }, 'Unknown Amount');
-      }
-
-      try {
-        amountRaw = Number(amountRaw);
-      } catch (e) {
-        return h('div', { class: 'italic' }, 'Invalid Amount');
-      }
-
+      const type = row.getValue('type') === 'I' ? 'positive' : 'negative';
+      const amountRaw = row.getValue('amount') as string | number | undefined;
+      const amount = amountRaw ? Number(amountRaw) : undefined;
       const currency = row.original.currency;
-      const amount = Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency,
-      }).format(amountRaw);
-
-      return h('div', { class: [type === 'Expense' && 'text-rose-600'] }, amount);
+      return h(RawAmountCell, { amount, currency, type });
     },
   },
   {
@@ -178,7 +148,7 @@ const selectedTransactions = computed(
 ) as ComputedRef<TransactionSchema[]>;
 
 const table = useVueTable({
-  data: transactions.value,
+  data: transactions,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -309,4 +279,3 @@ table.getColumn('description')?.toggleVisibility(false);
     </div>
   </div>
 </template>
-~~/shared/schemas/transaction

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
-import { expenseCategoryDetails } from '~~/shared/consts/transactions';
+import { transactionCategoryDetails } from '~~/shared/consts/transactions';
 
 const props = defineProps<{
   modelValue?: string;
@@ -12,17 +12,17 @@ const selectedValue = useVModel(props, 'modelValue');
 <template>
   <ShadSelect v-model:model-value="selectedValue">
     <ShadSelectTrigger>
-      <ShadSelectValue placeholder="Select Expense Category" />
+      <ShadSelectValue placeholder="Select Transaction Category" />
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>
-        <ShadSelectLabel>Expense Categories</ShadSelectLabel>
+        <ShadSelectLabel>Transaction Categories</ShadSelectLabel>
         <ShadSelectItem
-          v-for="expenseCategory in expenseCategoryDetails"
-          :key="expenseCategory.code"
-          :value="expenseCategory.code"
+          v-for="transactionCategoryDetail in transactionCategoryDetails"
+          :key="transactionCategoryDetail.code"
+          :value="transactionCategoryDetail.code"
         >
-          {{ expenseCategory.category }}
+          {{ transactionCategoryDetail.category }}
         </ShadSelectItem>
       </ShadSelectGroup>
     </ShadSelectContent>

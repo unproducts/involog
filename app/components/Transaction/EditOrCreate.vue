@@ -3,10 +3,8 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { type TransactionType } from '~~/shared/consts/transactions';
 import {
-  createExpenseTransactionSchema,
-  createIncomeTransactionSchema,
-  updateExpenseTransactionSchema,
-  updateIncomeTransactionSchema,
+  createTransactionSchema,
+  updateTransactionSchema,
   type TransactionSchema,
 } from '~~/shared/schemas/transaction';
 
@@ -15,7 +13,40 @@ const props = defineProps<{
   type?: TransactionType;
 }>();
 
+const emit = defineEmits<{
+  (e: 'update:loading', loading: boolean): void;
+  (e: 'submitted'): void;
+}>();
+
+const { stopHandles } = useStopHandles();
+
 const isUpdating = !!props.transaction;
+
+const {
+  mutate: createTransactionMutation,
+  status: createStatus,
+  isLoading: isCreatingTransaction,
+} = useCreateTransactionMutation();
+const {
+  mutate: updateTransactionMutation,
+  status: updateStatus,
+  isLoading: isUpdatingTransaction,
+} = useUpdateTransactionMutation();
+
+const loading = computed(() => isCreatingTransaction.value || isUpdatingTransaction.value);
+const status = useCombinedStatus([createStatus, updateStatus]);
+
+const s1 = watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    emit('submitted');
+  }
+});
+
+const s2 = watch(loading, (newLoading) => {
+  emit('update:loading', newLoading);
+});
+
+stopHandles.push(s1, s2);
 
 if (props.transaction && props.type) {
   if (props.transaction.type !== props.type) {
@@ -27,14 +58,7 @@ if (props.transaction && props.type) {
 
 const transactionType = props.type || (props.transaction?.type as TransactionType);
 
-const transactionSchema = isUpdating
-  ? transactionType == 'I'
-    ? updateIncomeTransactionSchema
-    : updateExpenseTransactionSchema
-  : transactionType == 'I'
-  ? createIncomeTransactionSchema
-  : createExpenseTransactionSchema;
-
+const transactionSchema = isUpdating ? updateTransactionSchema : createTransactionSchema;
 const formSchema = toTypedSchema(transactionSchema);
 const form = useForm({
   validationSchema: formSchema,
@@ -43,11 +67,15 @@ const form = useForm({
 if (isUpdating) {
   form.setValues(props.transaction || {});
 } else {
-  form.setValues({ type: transactionType });
+  form.setValues({ type: transactionType, isArchived: false });
 }
 
 const submit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values);
+  if (isUpdating) {
+    updateTransactionMutation({ ...values, id: props.transaction!.id });
+  } else {
+    createTransactionMutation(values);
+  }
 });
 
 const chooseClient = ref(false);
@@ -94,8 +122,7 @@ defineExpose({ submit });
       <ShadFormItem>
         <ShadFormLabel>Category<span class="text-red-700">*</span></ShadFormLabel>
         <ShadFormControl>
-          <SelectIncomeCategory v-bind="componentField" v-if="transactionType == 'I'" />
-          <SelectExpenseCategory v-bind="componentField" v-else />
+          <TransactionPickerCategory v-bind="componentField" />
         </ShadFormControl>
         <ShadFormMessage />
       </ShadFormItem>

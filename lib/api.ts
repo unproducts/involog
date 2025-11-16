@@ -19,10 +19,10 @@ import type { ItemSchema, MutateItemSchema } from '~~/shared/schemas/item';
 
 import type {
   TransactionSchema,
-  CreateExpenseTransactionSchema,
-  CreateIncomeTransactionSchema,
-  UpdateExpenseTransactionSchema,
-  UpdateIncomeTransactionSchema,
+  CreateTransactionSchema,
+  UpdateTransactionSchema,
+  FilterTransactionsSchema,
+  DeleteTransactionSchema,
 } from '~~/shared/schemas/transaction';
 
 import type { UnitSchema, MutateUnitSchema } from '~~/shared/schemas/measurement';
@@ -36,9 +36,9 @@ export interface ClientService {
 }
 
 export interface InvoiceService {
-  create(params: CreateInvoiceSchema): Promise<void>;
   fetch(): Promise<InvoiceSchema[]>;
   fetchById(id: string): Promise<InvoiceSchema | null>;
+  create(params: CreateInvoiceSchema): Promise<void>;
   update(params: UpdateInvoiceSchema): Promise<void>;
   delete(id: string): Promise<void>;
 }
@@ -60,15 +60,11 @@ export interface ItemService {
 }
 
 export interface TransactionService {
-  createExpense(params: CreateExpenseTransactionSchema): Promise<void>;
-  createIncome(params: CreateIncomeTransactionSchema): Promise<void>;
-  fetch(): Promise<TransactionSchema[]>;
+  fetch(params: FilterTransactionsSchema): Promise<TransactionSchema[]>;
   fetchById(id: string): Promise<TransactionSchema | null>;
-  fetchByType(type: 'I' | 'E'): Promise<TransactionSchema[]>;
-  fetchByClient(clientId: string): Promise<TransactionSchema[]>;
-  updateExpense(params: UpdateExpenseTransactionSchema): Promise<void>;
-  updateIncome(params: UpdateIncomeTransactionSchema): Promise<void>;
-  delete(id: string): Promise<void>;
+  create(params: CreateTransactionSchema): Promise<void>;
+  update(params: UpdateTransactionSchema): Promise<void>;
+  delete(params: DeleteTransactionSchema): Promise<void>;
 }
 
 export interface UnitService {

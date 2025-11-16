@@ -10,6 +10,7 @@ defineProps<{
 
 const editForm = ref<null | InstanceType<typeof EditOrCreate>>(null);
 const modalOpen = ref(false);
+const loading = ref(false);
 
 const save = () => {
   editForm.value?.submit();
@@ -34,10 +35,16 @@ defineExpose({
         <ShadDialogTitle v-if="transaction">Update Transaction</ShadDialogTitle>
         <ShadDialogTitle v-else>New {{ type == 'I' ? 'Income' : 'Expense' }}</ShadDialogTitle>
       </ShadDialogHeader>
-      <TransactionEditOrCreate :transaction :type ref="editForm" />
+      <TransactionEditOrCreate
+        :transaction
+        :type
+        ref="editForm"
+        @update:loading="loading = $event"
+        @submitted="modalOpen = false"
+      />
       <ShadDialogFooter>
-        <ShadButton variant="secondary" @click.prevent="modalOpen = false">Cancel</ShadButton>
-        <ShadButton @click.prevent="save">Save</ShadButton>
+        <ShadButton :disabled="loading" variant="secondary" @click.prevent="modalOpen = false">Cancel</ShadButton>
+        <ShadButton :disabled="loading" :loading="loading" @click.prevent="save">Save</ShadButton>
       </ShadDialogFooter>
     </ShadDialogContent>
   </ShadDialog>
