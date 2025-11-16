@@ -51,6 +51,17 @@ export const updateInvoicePrefixSchema = z.object({
 });
 export type UpdateInvoicePrefixSchema = z.infer<typeof updateInvoicePrefixSchema>;
 
+export const deleteInvoicePrefixSchema = z.object({
+  id: supplimentalFields.id,
+});
+export type DeleteInvoicePrefixSchema = z.infer<typeof deleteInvoicePrefixSchema>;
+
+export const filterInvoicePrefixesSchema = z.object({
+  ...SupplimentalFieldsFilterSet,
+  name: FilterSets.string().optional(),
+});
+export type FilterInvoicePrefixesSchema = z.infer<typeof filterInvoicePrefixesSchema>;
+
 const invoiceFields = {
   clientId: z.string().uuid(),
   subject: z

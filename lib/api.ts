@@ -16,9 +16,17 @@ import type {
   InvoiceInfoSchema,
   FilterInvoicesSchema,
   DeleteInvoiceSchema,
+  DeleteInvoicePrefixSchema,
+  FilterInvoicePrefixesSchema,
 } from '~~/shared/schemas/invoice';
 
-import type { ItemSchema, MutateItemSchema } from '~~/shared/schemas/item';
+import type {
+  ItemSchema,
+  CreateItemSchema,
+  UpdateItemSchema,
+  DeleteItemSchema,
+  FilterItemsSchema,
+} from '~~/shared/schemas/item';
 
 import type {
   TransactionSchema,
@@ -48,19 +56,19 @@ export interface InvoiceService {
 }
 
 export interface InvoicePrefixService {
-  create(params: CreateInvoicePrefixSchema): Promise<void>;
-  fetch(): Promise<InvoicePrefixSchema[]>;
+  fetch(params: FilterInvoicePrefixesSchema): Promise<InvoicePrefixSchema[]>;
   fetchById(id: string): Promise<InvoicePrefixSchema | null>;
+  create(params: CreateInvoicePrefixSchema): Promise<void>;
   update(params: UpdateInvoicePrefixSchema): Promise<void>;
-  delete(id: string): Promise<void>;
+  delete(params: DeleteInvoicePrefixSchema): Promise<void>;
 }
 
 export interface ItemService {
-  create(params: MutateItemSchema): Promise<void>;
-  fetch(): Promise<ItemSchema[]>;
+  fetch(params: FilterItemsSchema): Promise<ItemSchema[]>;
   fetchById(id: string): Promise<ItemSchema | null>;
-  update(id: string, params: MutateItemSchema): Promise<void>;
-  delete(id: string): Promise<void>;
+  create(params: CreateItemSchema): Promise<void>;
+  update(params: UpdateItemSchema): Promise<void>;
+  delete(params: DeleteItemSchema): Promise<void>;
 }
 
 export interface TransactionService {
