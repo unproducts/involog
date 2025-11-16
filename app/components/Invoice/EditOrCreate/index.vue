@@ -21,6 +21,31 @@ const props = defineProps<{
   invoice?: InvoiceSchema;
 }>();
 
+const emit = defineEmits<{
+  (e: 'update:loading', loading: boolean): void;
+  (e: 'submitted'): void;
+}>();
+
+const { stopHandles } = useStopHandles();
+
+const { mutate: createInvoice, status: createStatus, isLoading: isCreatingInvoice } = useCreateInvoiceMutation();
+const { mutate: updateInvoice, status: updateStatus, isLoading: isUpdatingInvoice } = useUpdateInvoiceMutation();
+
+const loading = computed(() => isCreatingInvoice.value || isUpdatingInvoice.value);
+const status = useCombinedStatus([createStatus, updateStatus]);
+
+const s1 = watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    emit('submitted');
+  }
+});
+
+const s2 = watch(loading, (newLoading) => {
+  emit('update:loading', newLoading);
+});
+
+stopHandles.push(s1, s2);
+
 const isUpdating = !!props.invoice;
 
 const formSchema = toTypedSchema(isUpdating ? updateInvoiceSchema : createInvoiceSchema);
@@ -30,6 +55,8 @@ const form = useForm({
 
 if (isUpdating) {
   form.setValues(props.invoice || {});
+} else {
+  form.setValues({ items: [], taxes: [], discounts: [] });
 }
 
 const showDueDate = ref(false);
@@ -94,7 +121,11 @@ const addDiscountAdjustmentEntry = () => addAdjustmentEntry(discountAdjustmentEn
 const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(discountAdjustmentEntries, index);
 
 const submitForm = form.handleSubmit(async (values) => {
-  console.log('Invoice form submitted!', values);
+  if (isUpdating) {
+    updateInvoice(values as any);
+  } else {
+    createInvoice(values as any);
+  }
 });
 
 const submit = async () => {
