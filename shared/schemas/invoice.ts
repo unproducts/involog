@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { currencyCodes } from '../consts/currencies';
-import { supplimentalFields } from './_base';
+import { currencyCodeSchema, FilterSets, supplimentalFields, SupplimentalFieldsFilterSet } from './_base';
 
 const itemEntryFields = {
   itemId: z.string().uuid(),
@@ -63,9 +62,7 @@ const invoiceFields = {
   number: z.string().max(255, 'Number cannot be longer than 255 chars').min(2, 'Number must have atleast 2 chars.'),
   date: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'), // date string, YYYY-MM-DD
   dueDate: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.').optional(), // date string, YYYY-MM-DD
-  currency: z
-    .string()
-    .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.'),
+  currency: currencyCodeSchema,
   items: z.array(itemEntrySchema),
   taxes: z.array(taxEntrySchema),
   discounts: z.array(discountEntrySchema),
@@ -88,3 +85,34 @@ export const updateInvoiceSchema = z.object({
   ...invoiceFields,
 });
 export type UpdateInvoiceSchema = z.infer<typeof updateInvoiceSchema>;
+
+export const deleteInvoiceSchema = z.object({
+  id: supplimentalFields.id,
+});
+export type DeleteInvoiceSchema = z.infer<typeof deleteInvoiceSchema>;
+
+export const filterInvoicesSchema = z.object({
+  ...SupplimentalFieldsFilterSet,
+  subject: FilterSets.string().optional(),
+  number: FilterSets.string().optional(),
+  date: FilterSets.dateRange().optional(),
+  dueDate: FilterSets.dateRange().optional(),
+  currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
+  clientId: FilterSets.discreteValues(supplimentalFields.id).optional(),
+  items: FilterSets.discreteValues(itemEntryFields.itemId).optional(),
+  note: FilterSets.string().optional(),
+});
+export type FilterInvoicesSchema = z.infer<typeof filterInvoicesSchema>;
+
+export const invoiceInfoFields = {
+  ...supplimentalFields,
+  clientId: invoiceFields.clientId,
+  subject: invoiceFields.subject,
+  prefixId: invoiceFields.prefixId,
+  number: invoiceFields.number,
+  date: invoiceFields.date,
+  dueDate: invoiceFields.dueDate,
+  currency: invoiceFields.currency,
+};
+export const invoiceInfoSchema = z.object(invoiceInfoFields);
+export type InvoiceInfoSchema = z.infer<typeof invoiceInfoSchema>;
