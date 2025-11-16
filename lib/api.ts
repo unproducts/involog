@@ -13,6 +13,9 @@ import type {
   InvoicePrefixSchema,
   CreateInvoicePrefixSchema,
   UpdateInvoicePrefixSchema,
+  InvoiceInfoSchema,
+  FilterInvoicesSchema,
+  DeleteInvoiceSchema,
 } from '~~/shared/schemas/invoice';
 
 import type { ItemSchema, MutateItemSchema } from '~~/shared/schemas/item';
@@ -36,11 +39,12 @@ export interface ClientService {
 }
 
 export interface InvoiceService {
-  fetch(): Promise<InvoiceSchema[]>;
-  fetchById(id: string): Promise<InvoiceSchema | null>;
+  fetch(params: FilterInvoicesSchema): Promise<InvoiceInfoSchema[]>;
+  fetchById(id: string): Promise<InvoiceInfoSchema | null>;
+  loadById(id: string): Promise<InvoiceSchema | null>;
   create(params: CreateInvoiceSchema): Promise<void>;
   update(params: UpdateInvoiceSchema): Promise<void>;
-  delete(id: string): Promise<void>;
+  delete(params: DeleteInvoiceSchema): Promise<void>;
 }
 
 export interface InvoicePrefixService {
