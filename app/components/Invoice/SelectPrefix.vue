@@ -9,21 +9,19 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const invoicePrefixesStore = useInvoicePrefixesStore();
-const { invoicePrefixes } = storeToRefs(invoicePrefixesStore);
+const { data: invoicePrefixes } = useQuery(getInvoicePrefixesColada({}));
+const { mutate: createInvoicePrefix } = useCreateInvoicePrefixMutation();
 
 const open = ref(false);
 const query = ref('');
 
 const createNewPrefix = async () => {
   if (query.value.length === 0) return;
-  // const prefix = await create({ name: query.value });
-  // selectedId.value = prefix.id;
-  // open.value = false;
+  createInvoicePrefix({ name: query.value });
 };
 
 const showCreateNewPrefix = computed(
-  () => query.value.length > 0 && !invoicePrefixes.value.map((p) => p.name).includes(query.value)
+  () => query.value.length > 0 && !invoicePrefixes.value?.map((p) => p.name).includes(query.value)
 );
 </script>
 
@@ -34,9 +32,7 @@ const showCreateNewPrefix = computed(
         <ReceiptText class="h-4 w-4 -ml-1" />
       </template>
       <template #trigger> Select prefix </template>
-      <template #value>
-        {{ invoicePrefixesStore.findById(selectedValue!)?.name }}
-      </template>
+      <template #value>{{ invoicePrefixes?.find((p) => p.id === selectedValue)?.name }}</template>
     </ShadPopoverTrigger>
     <ShadPopoverContent align="start">
       <ShadCommand v-model="selectedValue" v-model:query="query" aria-label="Select prefix">
@@ -44,7 +40,7 @@ const showCreateNewPrefix = computed(
         <ShadCommandList>
           <ShadCommandGroup>
             <ShadCommandItem
-              v-for="prefix in invoicePrefixes"
+              v-for="prefix in invoicePrefixes || []"
               :key="prefix.id"
               :value="prefix.id"
               @select="open = false"
