@@ -17,7 +17,7 @@ const itemEntry = useVModel(props, 'modelValue');
 const hasErrors = useVModel(props, 'hasErrors');
 const subtotalFormatted = useVModel(props, 'subtotalFormatted');
 
-const itemsStore = useItemsStore();
+const { data: items } = useQuery(getItemsColada());
 
 const { errors, values, handleSubmit } = useForm({
   validationSchema: toTypedSchema(itemEntrySchema),
@@ -45,12 +45,9 @@ const onFormValuesChange = () => {
   if (!props.currency) {
     return;
   }
-  const item = itemsStore.findById(values.itemId);
+  const item = items.value?.find((i) => i.id === values.itemId);
   if (!item) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Item not found',
-    });
+    return;
   }
   const itemSubtotal = calculateItemSubtotal(item, values.quantity ?? 0);
   subtotalFormatted.value = formatCurrency(props.currency, itemSubtotal);
