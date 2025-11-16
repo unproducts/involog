@@ -1,41 +1,55 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
-import { syncRef } from '@vueuse/core';
 import { useForm } from 'vee-validate';
-import type { WatchStopHandle } from 'vue';
-import { mutateClientSchema, type ClientSchema } from '~~/shared/schemas/client';
+import { createClientSchema, updateClientSchema, type ClientSchema } from '~~/shared/schemas/client';
 
 const props = defineProps<{
   client?: ClientSchema;
 }>();
 
-const status = defineModel<DataStateStatus>('status', { default: 'pending' });
-const loading = defineModel<boolean>('loading', { default: true });
+const emit = defineEmits<{
+  (e: 'update:loading', loading: boolean): void;
+  (e: 'submitted'): void;
+}>();
+
+const { stopHandles } = useStopHandles();
+
+const { mutate: createClient, status: createStatus, isLoading: isCreatingClient } = useCreateClientMutation();
+const { mutate: updateClient, status: updateStatus, isLoading: isUpdatingClient } = useUpdateClientMutation();
+
+const loading = computed(() => isCreatingClient.value || isUpdatingClient.value);
+const status = useCombinedStatus([createStatus, updateStatus]);
+
+const s1 = watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    emit('submitted');
+  }
+});
+
+const s2 = watch(loading, (newLoading) => {
+  emit('update:loading', newLoading);
+});
+
+stopHandles.push(s1, s2);
 
 const isUpdating = !!props.client;
 
-const formSchema = toTypedSchema(mutateClientSchema);
+const formSchema = toTypedSchema(isUpdating ? updateClientSchema : createClientSchema);
 const form = useForm({
   validationSchema: formSchema,
 });
 
 if (isUpdating) {
   form.setValues(props.client || {});
+} else {
+  form.setValues({ isArchived: false });
 }
-
-const { stopHandles } = useStopHandles();
 
 const submit = form.handleSubmit((values) => {
   if (isUpdating) {
-    const { mutate, status: updateStatus, isLoading } = useUpdateClientMutation({ id: props.client?.id });
-    mutate(values);
-    stopHandles.push(syncRef(status, updateStatus, { direction: 'rtl' }));
-    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+    updateClient({ ...values, id: props.client!.id });
   } else {
-    const { mutate, status: createStatus, isLoading } = useCreateClientMutation();
-    mutate(values);
-    stopHandles.push(syncRef(status, createStatus, { direction: 'rtl' }));
-    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+    createClient(values);
   }
 });
 

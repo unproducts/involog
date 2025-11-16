@@ -1,4 +1,10 @@
-import type { ClientSchema, MutateClientSchema } from '~~/shared/schemas/client';
+import type {
+  ClientSchema,
+  CreateClientSchema,
+  DeleteClientSchema,
+  FilterClientsSchema,
+  UpdateClientSchema,
+} from '~~/shared/schemas/client';
 
 import type {
   InvoiceSchema,
@@ -22,13 +28,11 @@ import type {
 import type { UnitSchema, MutateUnitSchema } from '~~/shared/schemas/measurement';
 
 export interface ClientService {
-  create(params: MutateClientSchema): Promise<void>;
-  fetch(): Promise<ClientSchema[]>;
+  fetch(params: FilterClientsSchema): Promise<ClientSchema[]>;
   fetchById(id: string): Promise<ClientSchema | null>;
-  update(id: string, params: MutateClientSchema): Promise<void>;
-  delete(id: string): Promise<void>;
-  archive(id: string): Promise<ClientSchema>;
-  unarchive(id: string): Promise<ClientSchema>;
+  create(params: CreateClientSchema): Promise<void>;
+  update(params: UpdateClientSchema): Promise<void>;
+  delete(params: DeleteClientSchema): Promise<void>;
 }
 
 export interface InvoiceService {

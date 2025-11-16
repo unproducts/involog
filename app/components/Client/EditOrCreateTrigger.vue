@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import type { ClientSchema } from '~~/shared/schemas/client';
-import type EditOrCreate from './EditOrCreate.vue';
 
 defineProps<{
   client?: ClientSchema;
 }>();
-
-const editForm = ref<InstanceType<typeof EditOrCreate>>();
-const status = ref<DataStateStatus>('pending');
-const loading = ref(false);
 const modalOpen = ref(false);
+const loading = ref(false);
 
-watch(status, (newStatus) => {
-  if (newStatus === 'success') {
-    modalOpen.value = false;
-  }
-});
+const editOrCreateRef = useTemplateRef('editOrCreateRef');
 </script>
 
 <template>
@@ -30,10 +22,15 @@ watch(status, (newStatus) => {
           {{ client ? 'Update' : 'Register' }} {{ client?.name || 'New Client' }}
         </ShadDialogDescription>
       </ShadDialogHeader>
-      <ClientEditOrCreate :client ref="editForm" v-model:status="status" v-model:loading="loading" />
+      <ClientEditOrCreate
+        :client
+        ref="editOrCreateRef"
+        @update:loading="loading = $event"
+        @submitted="modalOpen = false"
+      />
       <ShadDialogFooter>
-        <ShadButton variant="secondary" :disabled="loading" @click.prevent="modalOpen = false">Cancel</ShadButton>
-        <ShadButton @click.prevent="editForm?.submit()" :loading="loading">Save</ShadButton>
+        <ShadButton :disabled="loading" variant="secondary" @click.prevent="modalOpen = false">Cancel</ShadButton>
+        <ShadButton :disabled="loading" :loading="loading" @click.prevent="editOrCreateRef?.submit()">Save</ShadButton>
       </ShadDialogFooter>
     </ShadDialogContent>
   </ShadDialog>

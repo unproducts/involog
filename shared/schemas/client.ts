@@ -1,7 +1,15 @@
 import { z } from 'zod';
 import { currencyCodes } from '../consts/currencies';
 import { countryCodes } from '../consts/countries';
-import { supplimentalFields } from './_base';
+import { FilterSets, supplimentalFields, SupplimentalFieldsFilterSet } from './_base';
+
+export const countryCodeSchema = z
+  .string()
+  .refine((c) => countryCodes.includes(c), 'Invalid country code. Must be a valid ISO 4217 three-letter code.');
+
+export const currencyCodeSchema = z
+  .string()
+  .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.');
 
 const clientFields = {
   name: z.string().max(255, 'Name cannot be longer than 255 chars').min(2, 'Name must have atleast 2 chars.'),
@@ -9,16 +17,10 @@ const clientFields = {
   phone: z.string().min(10).max(50).optional(),
   billingAddress: z.string().optional(),
   shippingAddress: z.string().optional(),
-  country: z
-    .string()
-    .refine((c) => countryCodes.includes(c), 'Invalid country code. Must be a valid ISO 4217 three-letter code.')
-    .optional(),
+  country: countryCodeSchema.optional(),
   taxTag: z.string().optional(),
   taxNumber: z.string().optional(),
-  currency: z
-    .string()
-    .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.')
-    .optional(),
+  currency: currencyCodeSchema.optional(),
   isArchived: z.boolean().optional(),
 };
 export const clientSchema = z.object({
@@ -27,7 +29,32 @@ export const clientSchema = z.object({
 });
 export type ClientSchema = z.infer<typeof clientSchema>;
 
-export const mutateClientSchema = z.object({
+export const createClientSchema = z.object({
   ...clientFields,
 });
-export type MutateClientSchema = z.infer<typeof mutateClientSchema>;
+export type CreateClientSchema = z.infer<typeof createClientSchema>;
+
+export const updateClientSchema = z.object({
+  id: supplimentalFields.id,
+  ...clientFields,
+});
+
+export type UpdateClientSchema = z.infer<typeof updateClientSchema>;
+
+export const deleteClientSchema = z.object({
+  id: supplimentalFields.id,
+});
+
+export type DeleteClientSchema = z.infer<typeof deleteClientSchema>;
+
+export const filterClientsSchema = z.object({
+  ...SupplimentalFieldsFilterSet,
+  name: FilterSets.string().optional(),
+  email: FilterSets.string().optional(),
+  phone: FilterSets.string().optional(),
+  country: FilterSets.discreteValues(countryCodeSchema).optional(),
+  currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
+  isArchived: FilterSets.boolean().optional(),
+});
+
+export type FilterClientsSchema = z.infer<typeof filterClientsSchema>;
