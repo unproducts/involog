@@ -90,7 +90,6 @@ export class ClientServiceImpl implements ClientService {
   }
 
   async update(params: UpdateClientSchema): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const updateArgs = updateClientSchema.parse(params);
     const client = this.clients.value.find((c) => c.id === updateArgs.id);
     if (!client) {

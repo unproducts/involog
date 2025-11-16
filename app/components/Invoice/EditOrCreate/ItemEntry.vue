@@ -29,7 +29,6 @@ watch(errors, (value) => {
 });
 
 const submit = handleSubmit((values) => {
-  console.log('Item entry submitted!', values);
   itemEntry.value = values;
 });
 
