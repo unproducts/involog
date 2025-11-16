@@ -11,18 +11,13 @@ import {
   useVueTable,
 } from '@tanstack/vue-table';
 import { ArrowUpDown, MoreVertical, User2, ReceiptText } from 'lucide-vue-next';
-import { ShadButton, ShadCheckbox } from '#components';
-import type { InvoiceSchema } from '~~/shared/schemas/invoice';
-import { calculateInvoiceTotal } from '~~/lib/valuation';
-import { formatCurrency } from '~~/lib/formatting';
-import { formatDateFromStr } from '~~/shared/utils/general';
+import { NuxtLink, ShadButton, ShadCheckbox, ClientCell, InvoiceNumberCell, RawDateCell } from '#components';
+import type { InvoiceInfoSchema } from '~~/shared/schemas/invoice';
 
-const { invoices } = storeToRefs(useInvoicesStore());
-const clientsStore = useClientsStore();
-const invoicePrefixesStore = useInvoicePrefixesStore();
-const itemsStore = useItemsStore();
+const { data: invoicesData } = useQuery(getInvoicesColada({}));
+const invoices = computed(() => invoicesData.value || []);
 
-const columns: ColumnDef<InvoiceSchema>[] = [
+const columns: ColumnDef<InvoiceInfoSchema>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -44,17 +39,7 @@ const columns: ColumnDef<InvoiceSchema>[] = [
     accessorKey: 'clientId',
     header: () => h('div', { class: 'capitalize' }, 'Client'),
     cell: ({ row }) => {
-      const client = clientsStore.findById(row.original.clientId);
-      return client
-        ? h(
-            ShadButton,
-            {
-              variant: 'ghost',
-              class: '-ml-4',
-            },
-            () => [h(User2, { class: 'h-4 w-4' }), client.name]
-          )
-        : h('div', { class: 'italic' }, 'Unknown Client');
+      return h(ClientCell, { clientId: row.original.clientId, showIcon: true });
     },
   },
   {
@@ -85,10 +70,7 @@ const columns: ColumnDef<InvoiceSchema>[] = [
         () => ['Invoice Number', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => {
-      const prefix = invoicePrefixesStore.findById(row.original.prefixId) ?? { name: 'Unknown' };
-      return h('div', { class: 'capitalize' }, `${prefix.name}-${row.original.number}`);
-    },
+    cell: ({ row }) => h(InvoiceNumberCell, { prefixId: row.original.prefixId, number: row.original.number }),
   },
   {
     accessorKey: 'date',
@@ -103,29 +85,9 @@ const columns: ColumnDef<InvoiceSchema>[] = [
         () => ['Date Issued', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => {
-      const date = formatDateFromStr(row.getValue('date'));
-      return h('div', { class: 'capitalize' }, date);
-    },
+    cell: ({ row }) => h(RawDateCell, { value: row.original.date }),
   },
-  {
-    accessorKey: 'total',
-    header: ({ column }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          class: '!pl-0',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-        },
-        () => ['Total', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      );
-    },
-    cell: ({ row }) => {
-      const total = calculateInvoiceTotal(row.original, itemsStore.findById);
-      return h('div', { class: 'capitalize' }, formatCurrency(row.original.currency, total));
-    },
-  },
+  // Total requires full invoice with items; not available in info list
   {
     accessorKey: 'dueDate',
     header: ({ column }) => {
@@ -139,10 +101,7 @@ const columns: ColumnDef<InvoiceSchema>[] = [
         () => ['Due Date', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       );
     },
-    cell: ({ row }) => {
-      const dueDate = row.original.dueDate;
-      return h('div', { class: 'capitalize' }, dueDate ? formatDateFromStr(dueDate) : '');
-    },
+    cell: ({ row }) => h(RawDateCell, { value: row.original.dueDate }),
   },
   {
     id: 'actions',
@@ -167,7 +126,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data: invoices.value,
+  data: invoices,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -238,7 +197,7 @@ table.getColumn('dueDate')?.toggleVisibility(false);
         </ShadDropdownMenu>
       </div>
       <div class="flex items-center gap-2">
-        <ShadButton>
+        <ShadButton :as="NuxtLink" to="/invoices/new">
           <ReceiptText />
           New Invoice
         </ShadButton>
