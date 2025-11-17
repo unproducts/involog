@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, User2, ReceiptText } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, ReceiptText, Edit3 } from 'lucide-vue-next';
 import { NuxtLink, ShadButton, ShadCheckbox, ClientCell, InvoiceNumberCell, RawDateCell } from '#components';
 import type { InvoiceInfoSchema } from '~~/shared/schemas/invoice';
 
@@ -36,41 +36,22 @@ const columns: ColumnDef<InvoiceInfoSchema>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: 'number',
+    enableSorting: false,
+    header: () => h('div', { class: 'font-medium' }, 'Invoice Number'),
+    cell: ({ row }) => h(InvoiceNumberCell, { prefixId: row.original.prefixId, number: row.original.number }),
+  },
+  {
     accessorKey: 'clientId',
-    header: () => h('div', { class: 'capitalize' }, 'Client'),
-    cell: ({ row }) => {
-      return h(ClientCell, { clientId: row.original.clientId, showIcon: true });
-    },
+    enableSorting: false,
+    header: () => h('div', { class: 'font-medium' }, 'Client'),
+    cell: ({ row }) => h(ClientCell, { clientId: row.original.clientId, showIcon: true }),
   },
   {
     accessorKey: 'subject',
-    header: ({ column }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          class: '!pl-0',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-        },
-        () => ['Subject', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      );
-    },
+    enableSorting: false,
+    header: () => h('div', { class: 'font-medium' }, 'Subject'),
     cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('subject')),
-  },
-  {
-    accessorKey: 'number',
-    header: ({ column }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          class: '!pl-0',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-        },
-        () => ['Invoice Number', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
-      );
-    },
-    cell: ({ row }) => h(InvoiceNumberCell, { prefixId: row.original.prefixId, number: row.original.number }),
   },
   {
     accessorKey: 'date',
@@ -107,14 +88,26 @@ const columns: ColumnDef<InvoiceInfoSchema>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      return h(
-        ShadButton,
-        {
-          variant: 'ghost',
-          class: 'w-8 h-8 p-0',
-        },
-        () => [h(MoreVertical, { class: 'h-4 w-4' })]
-      );
+      return h('div', { class: 'flex space-x-1 items-center' }, [
+        h(
+          ShadButton,
+          {
+            variant: 'ghost',
+            class: 'w-8 h-8 p-0',
+            as: NuxtLink,
+            to: `/invoices/edit?id=${row.original.id}`,
+          },
+          () => [h('span', { class: 'sr-only' }, 'Edit invoice'), h(Edit3, { class: 'w-4 h-4' })]
+        ),
+        h(
+          ShadButton,
+          {
+            variant: 'ghost',
+            class: 'w-8 h-8 p-0',
+          },
+          () => [h('span', { class: 'sr-only' }, 'Open menu'), h(MoreVertical, { class: 'h-4 w-4' })]
+        ),
+      ]);
     },
   },
 ];
