@@ -8,11 +8,11 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { units } = storeToRefs(useUnitsStore());
+const { data: units } = useQuery(getUnitsColada());
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model="selectedValue">
     <ShadSelectTrigger>
       <div class="flex items-center gap-2">
         <ShadSelectIcon>

@@ -16,7 +16,7 @@ import {
 // Baseline static units that cannot be modified
 const baselineUnits: UnitSchema[] = [
   {
-    id: 'baseline-hours',
+    id: '2075574e-8ef1-42aa-ad5a-0ac7781a47c7',
     name: 'Hours',
     symbolSingular: 'Hr',
     symbolPlural: 'Hrs',
@@ -24,7 +24,7 @@ const baselineUnits: UnitSchema[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'baseline-days',
+    id: '9ff7dc7f-4ca7-4974-81a8-0d6a381c4a40',
     name: 'Days',
     symbolSingular: 'D',
     symbolPlural: 'Ds',
@@ -32,7 +32,7 @@ const baselineUnits: UnitSchema[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'baseline-weeks',
+    id: '0f79d84e-caa9-455e-9ae0-d8208d17d5f0',
     name: 'Weeks',
     symbolSingular: 'W',
     symbolPlural: 'Ws',
@@ -40,7 +40,7 @@ const baselineUnits: UnitSchema[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'baseline-months',
+    id: 'b1f8fc58-3d90-4ff7-ae3e-93d9181fdf9c',
     name: 'Months',
     symbolSingular: 'M',
     symbolPlural: 'Ms',
@@ -48,7 +48,7 @@ const baselineUnits: UnitSchema[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'baseline-years',
+    id: '94cfbb6b-5e90-4024-a667-8540f690f4fa',
     name: 'Years',
     symbolSingular: 'Y',
     symbolPlural: 'Ys',
