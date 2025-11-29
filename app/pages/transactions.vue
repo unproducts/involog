@@ -4,6 +4,6 @@ import { ArrowRightLeft } from 'lucide-vue-next';
 
 <template>
   <AppPage title="Transactions" :icon="ArrowRightLeft">
-    <TransactionTable class="mt-4" />
+    <TransactionTable />
   </AppPage>
 </template>

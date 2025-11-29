@@ -169,4 +169,3 @@ defineExpose({ submit });
     </ShadFormField>
   </form>
 </template>
-~~/shared/schemas/transaction
