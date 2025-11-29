@@ -1,19 +1,40 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
-import { syncRef } from '@vueuse/core';
 import { useForm } from 'vee-validate';
-import { mutateItemSchema, type ItemSchema } from '~~/shared/schemas/item';
+import { createItemSchema, updateItemSchema, type ItemSchema } from '~~/shared/schemas/item';
 
 const props = defineProps<{
   item?: ItemSchema;
 }>();
 
-const status = defineModel<DataStateStatus>('status', { default: 'pending' });
-const loading = defineModel<boolean>('loading', { default: true });
+const emit = defineEmits<{
+  (e: 'update:loading', loading: boolean): void;
+  (e: 'submitted'): void;
+}>();
+
+const { stopHandles } = useStopHandles();
+
+const { mutate: createItem, status: createStatus, isLoading: isCreatingItem } = useCreateItemMutation();
+const { mutate: updateItem, status: updateStatus, isLoading: isUpdatingItem } = useUpdateItemMutation();
+
+const loading = computed(() => isCreatingItem.value || isUpdatingItem.value);
+const status = useCombinedStatus([createStatus, updateStatus]);
+
+const s1 = watch(status, (newStatus) => {
+  if (newStatus === 'success') {
+    emit('submitted');
+  }
+});
+
+const s2 = watch(loading, (newLoading) => {
+  emit('update:loading', newLoading);
+});
+
+stopHandles.push(s1, s2);
 
 const isUpdating = !!props.item;
 
-const formSchema = toTypedSchema(mutateItemSchema);
+const formSchema = toTypedSchema(isUpdating ? updateItemSchema : createItemSchema);
 const form = useForm({
   validationSchema: formSchema,
 });
@@ -22,19 +43,11 @@ if (isUpdating) {
   form.setValues(props.item || {});
 }
 
-const { stopHandles } = useStopHandles();
-
 const submit = form.handleSubmit((values) => {
   if (isUpdating) {
-    const { mutate, status: updateStatus, isLoading } = useUpdateItemMutation({ id: props.item?.id! });
-    mutate(values);
-    stopHandles.push(syncRef(status, updateStatus, { direction: 'rtl' }));
-    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+    updateItem({ ...values, id: props.item!.id });
   } else {
-    const { mutate, status: createStatus, isLoading } = useCreateItemMutation();
-    mutate(values);
-    stopHandles.push(syncRef(status, createStatus, { direction: 'rtl' }));
-    stopHandles.push(syncRef(loading, isLoading, { direction: 'rtl' }));
+    createItem(values);
   }
 });
 
