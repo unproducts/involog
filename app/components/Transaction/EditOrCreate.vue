@@ -122,7 +122,7 @@ defineExpose({ submit });
       <ShadFormItem>
         <ShadFormLabel>Category<span class="text-red-700">*</span></ShadFormLabel>
         <ShadFormControl>
-          <TransactionPickerCategory v-bind="componentField" />
+          <TransactionSelectCategory v-bind="componentField" />
         </ShadFormControl>
         <ShadFormMessage />
       </ShadFormItem>

@@ -3,16 +3,17 @@ import { useVModel } from '@vueuse/core';
 import { transactionCategoryDetails } from '~~/shared/consts/transactions';
 
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
-      <ShadSelectValue placeholder="Select Transaction Category" />
+      <ShadSelectValue placeholder="Select Category" />
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>

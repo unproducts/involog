@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
@@ -10,7 +11,7 @@ const { data: clients } = useQuery(getClientsColada());
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
       <ShadSelectValue placeholder="Select Client" />
     </ShadSelectTrigger>
