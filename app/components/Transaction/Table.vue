@@ -236,7 +236,9 @@ table.getColumn('description')?.toggleVisibility(false);
         </TransactionEditOrCreateTrigger>
       </div>
     </div>
-    <TransactionTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
+    <FrameTransition>
+      <TransactionTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
+    </FrameTransition>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
         <ShadTableHeader>
