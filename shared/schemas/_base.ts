@@ -11,9 +11,18 @@ export const supplimentalFields = {
 export const currencyCodeSchema = z
   .string()
   .refine((c) => currencyCodes.includes(c), 'Invalid currency code. Must be a valid ISO 3166 three-letter code.');
+export type CurrencyCodeSchema = z.infer<typeof currencyCodeSchema>;
+
 export const countryCodeSchema = z
   .string()
   .refine((c) => countryCodes.includes(c), 'Invalid country code. Must be a valid ISO 4217 three-letter code.');
+export type CountryCodeSchema = z.infer<typeof countryCodeSchema>;
+
+export const dateRangeSchema = z.object({
+  from: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
+  to: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
+});
+export type DateRangeSchema = z.infer<typeof dateRangeSchema>;
 
 export const FilterSets = {
   discreteValues: (refinement: z.ZodType<string> = z.string()) => z.array(refinement),
@@ -27,11 +36,7 @@ export const FilterSets = {
       from: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
       to: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
     }),
-  dateTimeRange: () =>
-    z.object({
-      from: z.string().datetime(),
-      to: z.string().datetime(),
-    }),
+  dateTimeRange: () => dateRangeSchema,
   string: () => z.string(),
   boolean: () => z.boolean(),
 };
