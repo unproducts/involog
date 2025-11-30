@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
+import { List } from 'lucide-vue-next';
 import { transactionCategoryDetails } from '~~/shared/consts/transactions';
 
 const props = defineProps<{
@@ -13,6 +14,9 @@ const selectedValue = useVModel(props, 'modelValue');
 <template>
   <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
+      <template #icon>
+        <List class="h-4 w-4 -ml-1" />
+      </template>
       <ShadSelectValue placeholder="Select Category" />
     </ShadSelectTrigger>
     <ShadSelectContent>
