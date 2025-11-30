@@ -13,6 +13,7 @@ const props = defineProps<{
   disabled?: boolean;
 }>();
 
+const open = ref(false);
 const selectedValue = useVModel(props, 'modelValue');
 const value = ref<DateValue>();
 
@@ -27,11 +28,12 @@ watch(value, (newValue) => {
   } else {
     selectedValue.value = undefined;
   }
+  open.value = !open.value;
 });
 </script>
 
 <template>
-  <ShadPopover>
+  <ShadPopover v-model:open="open">
     <ShadPopoverTrigger :value="value" :disabled="disabled">
       <template #trigger>
         <CalendarIcon class="h-4 w-4 -ml-1" />
