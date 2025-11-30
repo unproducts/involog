@@ -4,14 +4,15 @@ import { Flag } from 'lucide-vue-next';
 import { countryDetails } from '~~/shared/consts/countries';
 
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
       <template #icon>
         <Flag class="h-4 w-4 -ml-1" />

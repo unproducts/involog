@@ -48,26 +48,20 @@ export class ClientServiceImpl implements ClientService {
       });
     }
 
-    if (filterArgs.name) {
-      const term = filterArgs.name.toLowerCase();
-      filtered = filtered.filter((c) => c.name.toLowerCase().includes(term));
-    }
-    if (filterArgs.email) {
-      const term = filterArgs.email.toLowerCase();
-      filtered = filtered.filter((c) => c.email?.toLowerCase().includes(term));
-    }
-    if (filterArgs.phone) {
-      const term = filterArgs.phone.toLowerCase();
-      filtered = filtered.filter((c) => c.phone?.toLowerCase().includes(term));
+    if (filterArgs.search) {
+      const term = filterArgs.search.toLowerCase();
+      filtered = filtered.filter(
+        (c) =>
+          c.name.toLowerCase().includes(term) ||
+          c.email?.toLowerCase().includes(term) ||
+          c.phone?.toLowerCase().includes(term)
+      );
     }
     if (filterArgs.country && filterArgs.country.length > 0) {
       filtered = filtered.filter((c) => c.country && filterArgs.country!.includes(c.country));
     }
     if (filterArgs.currency && filterArgs.currency.length > 0) {
       filtered = filtered.filter((c) => c.currency && filterArgs.currency!.includes(c.currency));
-    }
-    if (filterArgs.isArchived !== undefined) {
-      filtered = filtered.filter((c) => (c.isArchived ?? false) === filterArgs.isArchived);
     }
 
     return filtered;

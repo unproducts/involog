@@ -45,12 +45,9 @@ export type DeleteClientSchema = z.infer<typeof deleteClientSchema>;
 
 export const filterClientsSchema = z.object({
   ...SupplimentalFieldsFilterSet,
-  name: FilterSets.string().optional(),
-  email: FilterSets.string().optional(),
-  phone: FilterSets.string().optional(),
+  search: FilterSets.string().optional(),
   country: FilterSets.discreteValues(countryCodeSchema).optional(),
   currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
-  isArchived: FilterSets.boolean().optional(),
 });
 
 export type FilterClientsSchema = z.infer<typeof filterClientsSchema>;

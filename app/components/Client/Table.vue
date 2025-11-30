@@ -10,10 +10,10 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, Filter } from 'lucide-vue-next';
 import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { ClientSchema } from '~~/shared/schemas/client';
+import type { ClientSchema, FilterClientsSchema } from '~~/shared/schemas/client';
 import { countryDetailsMap } from '~~/shared/consts/countries';
 
 const { data: clientsData } = useQuery(getClientsColada());
@@ -86,6 +86,9 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
+const showFilter = ref(false);
+const filter = ref<FilterClientsSchema>({});
+const searchString = ref('');
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedClients = computed(
@@ -127,41 +130,52 @@ const table = useVueTable({
 
 <template>
   <div class="w-full">
-    <div class="flex items-center pb-4">
-      <ShadInput
-        class="max-w-sm"
-        placeholder="Filter clients..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
-      />
-      <ShadDropdownMenu>
-        <ShadDropdownMenuTrigger as-child>
-          <ShadButton variant="ghost" class="w-8 h-8 p-0 ml-2">
-            <span class="sr-only">Open menu</span>
-            <MoreVertical class="w-4 h-4" />
-          </ShadButton>
-        </ShadDropdownMenuTrigger>
-        <ShadDropdownMenuContent align="end">
-          <ShadDropdownMenuCheckboxItem
-            v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
-            :key="column.id"
-            class="capitalize"
-            :model-value="column.getIsVisible()"
-            @update:model-value="
-              (value) => {
-                column.toggleVisibility(!!value);
-              }
-            "
-          >
-            {{ column.id }}
-          </ShadDropdownMenuCheckboxItem>
-        </ShadDropdownMenuContent>
-      </ShadDropdownMenu>
+    <div class="flex items-center justify-between gap-2 pb-4 w-full">
+      <div class="flex items-center w-full gap-2">
+        <ShadInput
+          class="w-1/2"
+          placeholder="Filter clients..."
+          :model-value="searchString"
+          @update:model-value="(value) => (searchString = value.toString())"
+        />
+        <ShadDropdownMenu>
+          <ShadDropdownMenuTrigger as-child>
+            <ShadButton variant="ghost" class="w-8 h-8 p-0">
+              <span class="sr-only">Open menu</span>
+              <MoreVertical class="w-4 h-4" />
+            </ShadButton>
+          </ShadDropdownMenuTrigger>
+          <ShadDropdownMenuContent align="end">
+            <ShadDropdownMenuCheckboxItem
+              v-for="column in table.getAllColumns().filter((column) => column.getCanHide())"
+              :key="column.id"
+              class="capitalize"
+              :model-value="column.getIsVisible()"
+              @update:model-value="
+                (value) => {
+                  column.toggleVisibility(!!value);
+                }
+              "
+            >
+              {{ column.id }}
+            </ShadDropdownMenuCheckboxItem>
+          </ShadDropdownMenuContent>
+        </ShadDropdownMenu>
+      </div>
+      <ShadToggle variant="outline" v-model="showFilter" as-child>
+        <ShadButton variant="ghost" class="w-8 h-8 p-0">
+          <span class="sr-only">Toggle filter</span>
+          <Filter class="w-4 h-4" />
+        </ShadButton>
+      </ShadToggle>
       <ClientEditDropdownBulk :clients="selectedClients" v-if="showBulkActions" />
       <ClientEditOrCreateTrigger v-else>
         <ShadButton> New Client </ShadButton>
       </ClientEditOrCreateTrigger>
     </div>
+    <FrameTransition>
+      <ClientTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
+    </FrameTransition>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
         <ShadTableHeader>
