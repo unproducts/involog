@@ -34,11 +34,10 @@ export type DeleteItemSchema = z.infer<typeof deleteItemSchema>;
 
 export const filterItemsSchema = z.object({
   ...SupplimentalFieldsFilterSet,
-  name: FilterSets.string().optional(),
-  description: FilterSets.string().optional(),
+  search: FilterSets.string().optional(),
   price: FilterSets.numberRange().optional(),
   isService: FilterSets.boolean().optional(),
   unitId: FilterSets.discreteValues(itemFields.unitId).optional(),
-  currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
+  currency: FilterSets.discreteValues(itemFields.currency).optional(),
 });
 export type FilterItemsSchema = z.infer<typeof filterItemsSchema>;

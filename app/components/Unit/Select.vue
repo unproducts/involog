@@ -3,7 +3,8 @@ import { useVModel } from '@vueuse/core';
 import { Ruler } from 'lucide-vue-next';
 
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
@@ -12,7 +13,7 @@ const { data: units } = useQuery(getUnitsColada());
 </script>
 
 <template>
-  <ShadSelect v-model="selectedValue">
+  <ShadSelect v-model="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
       <template #icon>
         <Ruler class="h-4 w-4 -ml-1" />

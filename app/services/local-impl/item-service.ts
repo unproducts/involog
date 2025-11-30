@@ -45,13 +45,11 @@ export class ItemServiceImpl implements ItemService {
       });
     }
 
-    if (filterArgs.name) {
-      const term = filterArgs.name.toLowerCase();
-      filtered = filtered.filter((i) => i.name.toLowerCase().includes(term));
-    }
-    if (filterArgs.description) {
-      const term = filterArgs.description.toLowerCase();
-      filtered = filtered.filter((i) => i.description?.toLowerCase().includes(term));
+    if (filterArgs.search) {
+      const term = filterArgs.search.toLowerCase();
+      filtered = filtered.filter(
+        (i) => i.name.toLowerCase().includes(term) || i.description?.toLowerCase().includes(term)
+      );
     }
     if (filterArgs.price) {
       filtered = filtered.filter((i) => {

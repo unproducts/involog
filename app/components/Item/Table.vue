@@ -10,10 +10,10 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, Filter } from 'lucide-vue-next';
 import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { ItemSchema } from '~~/shared/schemas/item';
+import type { ItemSchema, FilterItemsSchema } from '~~/shared/schemas/item';
 
 const { data: itemsData } = useQuery(getItemsColada());
 const items = computed(() => itemsData.value || []);
@@ -102,6 +102,9 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
+const showFilter = ref(false);
+const filter = ref<FilterItemsSchema>({});
+const searchString = ref('');
 
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedItems = computed(
@@ -143,17 +146,17 @@ const table = useVueTable({
 
 <template>
   <div class="w-full">
-    <div class="flex items-center justify-between pb-4">
+    <div class="flex items-center justify-between gap-2 pb-4 w-full">
       <div class="flex items-center w-full gap-2">
         <ShadInput
-          class="max-w-sm"
+          class="w-1/2"
           placeholder="Filter items..."
-          :model-value="table.getColumn('name')?.getFilterValue() as string"
-          @update:model-value="table.getColumn('name')?.setFilterValue($event)"
+          :model-value="searchString"
+          @update:model-value="(value) => (searchString = value.toString())"
         />
         <ShadDropdownMenu>
           <ShadDropdownMenuTrigger as-child>
-            <ShadButton variant="ghost" class="w-8 h-8 p-0 ml-2">
+            <ShadButton variant="ghost" class="w-8 h-8 p-0">
               <span class="sr-only">Open menu</span>
               <MoreVertical class="w-4 h-4" />
             </ShadButton>
@@ -175,11 +178,20 @@ const table = useVueTable({
           </ShadDropdownMenuContent>
         </ShadDropdownMenu>
       </div>
+      <ShadToggle variant="outline" v-model="showFilter" as-child>
+        <ShadButton variant="ghost" class="w-8 h-8 p-0">
+          <span class="sr-only">Toggle filter</span>
+          <Filter class="w-4 h-4" />
+        </ShadButton>
+      </ShadToggle>
       <ItemEditDropdownBulk :items="selectedItems" v-if="showBulkActions" />
       <ItemEditOrCreateTrigger v-else>
         <ShadButton> New Item </ShadButton>
       </ItemEditOrCreateTrigger>
     </div>
+    <FrameTransition>
+      <ItemTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
+    </FrameTransition>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
         <ShadTableHeader>

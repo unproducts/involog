@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core';
 import { type FilterTransactionsSchema } from '~~/shared/schemas/transaction';
+import { Archive } from 'lucide-vue-next';
 
 const searchString = defineModel<string>('searchString', { required: true });
 const filter = defineModel<FilterTransactionsSchema>('modelValue', { required: true });
@@ -32,6 +33,13 @@ watchDebounced(
     </div>
     <div class="w-48">
       <ClientSelect v-model="filter.clientId" multiple />
+    </div>
+    <div class="w-48">
+      <SelectBoolean v-model="filter.isArchived" true-value="Archived" false-value="Active" placeholder="Status">
+        <template #icon>
+          <Archive class="h-4 w-4 -ml-1" />
+        </template>
+      </SelectBoolean>
     </div>
   </div>
 </template>

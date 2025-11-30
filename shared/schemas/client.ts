@@ -48,6 +48,7 @@ export const filterClientsSchema = z.object({
   search: FilterSets.string().optional(),
   country: FilterSets.discreteValues(countryCodeSchema).optional(),
   currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
+  isArchived: FilterSets.boolean().optional(),
 });
 
 export type FilterClientsSchema = z.infer<typeof filterClientsSchema>;
