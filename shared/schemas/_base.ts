@@ -24,19 +24,23 @@ export const dateRangeSchema = z.object({
 });
 export type DateRangeSchema = z.infer<typeof dateRangeSchema>;
 
+export const numberRangeSchema = z.object({
+  min: z.number().optional(),
+  max: z.number().optional(),
+});
+export type NumberRangeSchema = z.infer<typeof numberRangeSchema>;
+
+export const dateTimeRangeSchema = z.object({
+  from: z.string().datetime(),
+  to: z.string().datetime(),
+});
+export type DateTimeRangeSchema = z.infer<typeof dateTimeRangeSchema>;
+
 export const FilterSets = {
   discreteValues: (refinement: z.ZodType<string> = z.string()) => z.array(refinement),
-  numberRange: () =>
-    z.object({
-      min: z.number().optional(),
-      max: z.number().optional(),
-    }),
-  dateRange: () =>
-    z.object({
-      from: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
-      to: z.string().refine(isValidDate, 'Date must be formatted with YYYY-MM-DD format.'),
-    }),
-  dateTimeRange: () => dateRangeSchema,
+  numberRange: () => numberRangeSchema,
+  dateRange: () => dateRangeSchema,
+  dateTimeRange: () => dateTimeRangeSchema,
   string: () => z.string(),
   boolean: () => z.boolean(),
 };
