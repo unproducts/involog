@@ -54,9 +54,14 @@ export class TransactionServiceImpl implements TransactionService {
     }
 
     // Filter by description
-    if (filterTransactionArgs.description) {
-      const searchTerm = filterTransactionArgs.description.toLowerCase();
-      filtered = filtered.filter((t) => t.description.toLowerCase().includes(searchTerm));
+    if (filterTransactionArgs.search) {
+      const searchTerm = filterTransactionArgs.search.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.description.toLowerCase().includes(searchTerm) ||
+          t.merchant?.toLowerCase().includes(searchTerm) ||
+          t.notes?.toLowerCase().includes(searchTerm)
+      );
     }
 
     // Filter by amount
@@ -97,21 +102,9 @@ export class TransactionServiceImpl implements TransactionService {
       filtered = filtered.filter((t) => t.category && filterTransactionArgs.category!.includes(t.category));
     }
 
-    // Filter by merchant
-    if (filterTransactionArgs.merchant) {
-      const searchTerm = filterTransactionArgs.merchant.toLowerCase();
-      filtered = filtered.filter((t) => t.merchant?.toLowerCase().includes(searchTerm));
-    }
-
     // Filter by clientId
     if (filterTransactionArgs.clientId && filterTransactionArgs.clientId.length > 0) {
       filtered = filtered.filter((t) => t.clientId && filterTransactionArgs.clientId!.includes(t.clientId));
-    }
-
-    // Filter by notes
-    if (filterTransactionArgs.notes) {
-      const searchTerm = filterTransactionArgs.notes.toLowerCase();
-      filtered = filtered.filter((t) => t.notes?.toLowerCase().includes(searchTerm));
     }
 
     // Filter by isArchived

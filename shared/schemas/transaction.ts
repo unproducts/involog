@@ -48,15 +48,13 @@ export type DeleteTransactionSchema = z.infer<typeof deleteTransactionSchema>;
 
 export const filterTransactionsSchema = z.object({
   ...SupplimentalFieldsFilterSet,
-  description: FilterSets.string().optional(),
   amount: FilterSets.numberRange().optional(),
+  search: FilterSets.string().optional(),
   currency: FilterSets.discreteValues(transactionFields.currency).optional(),
   date: FilterSets.dateRange().optional(),
   type: FilterSets.discreteValues(transactionTypeSchema).optional(),
   category: FilterSets.discreteValues(transactionCategorySchema).optional(),
-  merchant: FilterSets.string().optional(),
   clientId: FilterSets.discreteValues(z.string().uuid()).optional(),
-  notes: FilterSets.string().optional(),
   isArchived: FilterSets.boolean().optional(),
 });
 export type FilterTransactionsSchema = z.infer<typeof filterTransactionsSchema>;
