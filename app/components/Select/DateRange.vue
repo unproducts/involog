@@ -36,15 +36,15 @@ if (props.modelValue?.from) {
 watch(
   value,
   (newValue) => {
-    if (newValue?.start && newValue.end) {
-      selectedValue.value = {
-        from: formatDate(newValue.start.toDate(getLocalTimeZone())),
-        to: formatDate(newValue.end.toDate(getLocalTimeZone())),
-      };
-    } else {
+    if (!newValue || !newValue.start || !newValue.end) {
       selectedValue.value = undefined;
+      return;
     }
-    open.value = !open.value;
+    selectedValue.value = {
+      from: formatDate(newValue.start.toDate(getLocalTimeZone())),
+      to: formatDate(newValue.end.toDate(getLocalTimeZone())),
+    };
+    open.value = false;
   },
   { deep: true }
 );
