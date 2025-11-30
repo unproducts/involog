@@ -10,10 +10,10 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, MoveDownRight, MoveUpLeft, Filter } from 'lucide-vue-next';
 import { ShadBadge, ShadButton, ShadCheckbox, ClientCell, RawAmountCell } from '#components';
 import DropdownAction from './EditDropdown.vue';
-import type { TransactionSchema } from '~~/shared/schemas/transaction';
+import type { FilterTransactionsSchema, TransactionSchema } from '~~/shared/schemas/transaction';
 import { transactionCategoriesMap, type TransactionCategory } from '~~/shared/consts/transactions';
 
 const { data: transactionsData } = useQuery(getTransactionsColada());
@@ -141,11 +141,14 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
-
+const showFilter = ref(false);
+const filter = ref<FilterTransactionsSchema>({});
 const showBulkActions = computed(() => Object.keys(rowSelection.value).length > 0);
 const selectedTransactions = computed(
   () => Object.keys(rowSelection.value).map((index) => transactions.value[Number(index)]) || []
 ) as ComputedRef<TransactionSchema[]>;
+
+const searchString = ref('');
 
 const table = useVueTable({
   data: transactions,
@@ -190,8 +193,8 @@ table.getColumn('description')?.toggleVisibility(false);
         <ShadInput
           class="w-1/2"
           placeholder="Filter transactions..."
-          :model-value="table.getColumn('description')?.getFilterValue() as string"
-          @update:model-value="table.getColumn('description')?.setFilterValue($event)"
+          :model-value="searchString"
+          @update:model-value="(value) => (searchString = value.toString())"
         />
         <ShadDropdownMenu>
           <ShadDropdownMenuTrigger as-child>
@@ -217,6 +220,12 @@ table.getColumn('description')?.toggleVisibility(false);
           </ShadDropdownMenuContent>
         </ShadDropdownMenu>
       </div>
+      <ShadToggle variant="outline" v-model="showFilter" as-child>
+        <ShadButton variant="ghost" class="w-8 h-8 p-0">
+          <span class="sr-only">Toggle filter</span>
+          <Filter class="w-4 h-4" />
+        </ShadButton>
+      </ShadToggle>
       <TransactionEditDropdownBulk :transactions="selectedTransactions" v-if="showBulkActions" />
       <div class="flex items-center gap-2" v-else>
         <TransactionEditOrCreateTrigger type="I">
@@ -227,6 +236,7 @@ table.getColumn('description')?.toggleVisibility(false);
         </TransactionEditOrCreateTrigger>
       </div>
     </div>
+    <TransactionTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
         <ShadTableHeader>
