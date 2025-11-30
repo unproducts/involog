@@ -14,6 +14,6 @@ const { data: invoice } = useQuery(getInvoiceByIdColada({ id }));
 
 <template>
   <AppPage :title="`Edit Invoice ${invoice.number}`" :icon="ReceiptText" v-if="invoice">
-    <InvoiceEditOrCreate :invoice />
+    <InvoiceEditOrCreate :invoice @submitted="navigateTo('/invoices')" />
   </AppPage>
 </template>
