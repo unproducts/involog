@@ -13,12 +13,10 @@ const { data: items } = useQuery(getItemsColada());
 <template>
   <ShadSelect v-model:model-value="selectedValue">
     <ShadSelectTrigger>
-      <div class="flex items-center gap-2">
-        <ShadSelectIcon>
-          <GanttChart class="h-4 w-4 -ml-1" />
-        </ShadSelectIcon>
-        <ShadSelectValue placeholder="Select Item" />
-      </div>
+      <template #icon>
+        <GanttChart class="h-4 w-4 -ml-1" />
+      </template>
+      <ShadSelectValue placeholder="Select Item" />
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>

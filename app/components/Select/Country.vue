@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
+import { Flag } from 'lucide-vue-next';
 import { countryDetails } from '~~/shared/consts/countries';
 
 const props = defineProps<{
@@ -12,6 +13,9 @@ const selectedValue = useVModel(props, 'modelValue');
 <template>
   <ShadSelect v-model:model-value="selectedValue">
     <ShadSelectTrigger>
+      <template #icon>
+        <Flag class="h-4 w-4 -ml-1" />
+      </template>
       <ShadSelectValue placeholder="Select Country" />
     </ShadSelectTrigger>
     <ShadSelectContent>

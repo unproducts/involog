@@ -14,12 +14,10 @@ const { data: units } = useQuery(getUnitsColada());
 <template>
   <ShadSelect v-model="selectedValue">
     <ShadSelectTrigger>
-      <div class="flex items-center gap-2">
-        <ShadSelectIcon>
-          <Ruler class="h-4 w-4 -ml-1" />
-        </ShadSelectIcon>
-        <ShadSelectValue placeholder="Select Unit" />
-      </div>
+      <template #icon>
+        <Ruler class="h-4 w-4 -ml-1" />
+      </template>
+      <ShadSelectValue placeholder="Select Unit" />
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>

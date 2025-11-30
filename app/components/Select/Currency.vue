@@ -4,21 +4,20 @@ import { currencyDetails } from '~~/shared/consts/currencies';
 import { Banknote } from 'lucide-vue-next';
 
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
-      <div class="flex items-center gap-2">
-        <ShadSelectIcon>
-          <Banknote class="h-4 w-4 -ml-1" />
-        </ShadSelectIcon>
-        <ShadSelectValue placeholder="Select Currency" />
-      </div>
+      <template #icon>
+        <Banknote class="h-4 w-4 -ml-1" />
+      </template>
+      <ShadSelectValue placeholder="Select Currency" />
     </ShadSelectTrigger>
     <ShadSelectContent>
       <ShadSelectGroup>

@@ -32,10 +32,12 @@ const forwardedProps = useForwardProps(delegatedProps);
       ),
     ]"
   >
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 w-[calc(100%-1rem)]">
       <slot name="icon" />
-      <slot name="value" v-if="value" />
-      <slot name="trigger" v-else />
+      <div class="w-4/5 truncate">
+        <slot name="value" v-if="value" />
+        <slot name="trigger" v-else />
+      </div>
     </div>
     <SelectIcon as-child>
       <ChevronDown class="w-4 h-4 opacity-50 shrink-0" />

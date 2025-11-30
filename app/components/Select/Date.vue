@@ -35,14 +35,11 @@ watch(value, (newValue) => {
 <template>
   <ShadPopover v-model:open="open">
     <ShadPopoverTrigger :value="value" :disabled="disabled">
-      <template #trigger>
+      <template #icon>
         <CalendarIcon class="h-4 w-4 -ml-1" />
-        Select date
       </template>
-      <template #value>
-        <CalendarIcon class="h-4 w-4 -ml-1" />
-        {{ df.format(value!.toDate(getLocalTimeZone())) }}
-      </template>
+      <template #trigger> Select date </template>
+      <template #value>{{ df.format(value!.toDate(getLocalTimeZone())) }}</template>
     </ShadPopoverTrigger>
     <ShadPopoverContent class="w-auto p-0">
       <ShadCalendar v-model="value" initial-focus />

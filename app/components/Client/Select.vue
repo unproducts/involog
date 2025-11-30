@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useVModel } from '@vueuse/core';
+import { Users } from 'lucide-vue-next';
 const props = defineProps<{
   modelValue?: string | string[];
   multiple?: boolean;
@@ -13,6 +14,9 @@ const { data: clients } = useQuery(getClientsColada());
 <template>
   <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
+      <template #icon>
+        <Users class="h-4 w-4 -ml-1" />
+      </template>
       <ShadSelectValue placeholder="Select Client" />
     </ShadSelectTrigger>
     <ShadSelectContent>
