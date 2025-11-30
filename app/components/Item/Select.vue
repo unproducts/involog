@@ -2,7 +2,8 @@
 import { useVModel } from '@vueuse/core';
 import { GanttChart } from 'lucide-vue-next';
 const props = defineProps<{
-  modelValue?: string;
+  modelValue?: string | string[];
+  multiple?: boolean;
 }>();
 
 const selectedValue = useVModel(props, 'modelValue');
@@ -11,7 +12,7 @@ const { data: items } = useQuery(getItemsColada());
 </script>
 
 <template>
-  <ShadSelect v-model:model-value="selectedValue">
+  <ShadSelect v-model:model-value="selectedValue" :multiple="multiple">
     <ShadSelectTrigger>
       <template #icon>
         <GanttChart class="h-4 w-4 -ml-1" />

@@ -10,9 +10,9 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
-import { ArrowUpDown, MoreVertical, ReceiptText, Edit3 } from 'lucide-vue-next';
+import { ArrowUpDown, MoreVertical, ReceiptText, Edit3, Filter } from 'lucide-vue-next';
 import { NuxtLink, ShadButton, ShadCheckbox, ClientCell, InvoiceNumberCell, RawDateCell } from '#components';
-import type { InvoiceInfoSchema } from '~~/shared/schemas/invoice';
+import type { InvoiceInfoSchema, FilterInvoicesSchema } from '~~/shared/schemas/invoice';
 
 const { data: invoicesData } = useQuery(getInvoicesColada({}));
 const invoices = computed(() => invoicesData.value || []);
@@ -117,6 +117,9 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
+const showFilter = ref(false);
+const filter = ref<FilterInvoicesSchema>({});
+const searchString = ref('');
 
 const table = useVueTable({
   data: invoices,
@@ -162,8 +165,8 @@ table.getColumn('dueDate')?.toggleVisibility(false);
         <ShadInput
           class="w-1/2"
           placeholder="Filter invoices..."
-          :model-value="table.getColumn('subject')?.getFilterValue() as string"
-          @update:model-value="table.getColumn('subject')?.setFilterValue($event)"
+          :model-value="searchString"
+          @update:model-value="(value) => (searchString = value.toString())"
         />
         <ShadDropdownMenu>
           <ShadDropdownMenuTrigger as-child>
@@ -189,6 +192,12 @@ table.getColumn('dueDate')?.toggleVisibility(false);
           </ShadDropdownMenuContent>
         </ShadDropdownMenu>
       </div>
+      <ShadToggle variant="outline" v-model="showFilter" as-child>
+        <ShadButton variant="ghost" class="w-8 h-8 p-0">
+          <span class="sr-only">Toggle filter</span>
+          <Filter class="w-4 h-4" />
+        </ShadButton>
+      </ShadToggle>
       <div class="flex items-center gap-2">
         <ShadButton :as="NuxtLink" to="/invoices/new">
           <ReceiptText />
@@ -196,6 +205,9 @@ table.getColumn('dueDate')?.toggleVisibility(false);
         </ShadButton>
       </div>
     </div>
+    <FrameTransition>
+      <InvoiceTableFilter v-if="showFilter" v-model="filter" v-model:search-string="searchString" />
+    </FrameTransition>
     <div class="rounded-md border w-full overflow-auto">
       <ShadTable>
         <ShadTableHeader>

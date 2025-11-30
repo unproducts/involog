@@ -49,13 +49,14 @@ export class InvoiceServiceImpl implements InvoiceService {
       });
     }
 
-    if (filterArgs.subject) {
-      const term = filterArgs.subject.toLowerCase();
-      filtered = filtered.filter((i) => i.subject?.toLowerCase().includes(term));
-    }
-    if (filterArgs.number) {
-      const term = filterArgs.number.toLowerCase();
-      filtered = filtered.filter((i) => i.number.toLowerCase().includes(term));
+    if (filterArgs.search) {
+      const term = filterArgs.search.toLowerCase();
+      filtered = filtered.filter(
+        (i) =>
+          i.subject?.toLowerCase().includes(term) ||
+          i.number.toLowerCase().includes(term) ||
+          i.note?.toLowerCase().includes(term)
+      );
     }
     if (filterArgs.date) {
       const { from, to } = filterArgs.date;
@@ -88,10 +89,6 @@ export class InvoiceServiceImpl implements InvoiceService {
     }
     if (filterArgs.items && filterArgs.items.length > 0) {
       filtered = filtered.filter((i) => i.items.some((ie) => filterArgs.items!.includes(ie.itemId)));
-    }
-    if (filterArgs.note) {
-      const term = filterArgs.note.toLowerCase();
-      filtered = filtered.filter((i) => i.note?.toLowerCase().includes(term));
     }
 
     // Map to info shape

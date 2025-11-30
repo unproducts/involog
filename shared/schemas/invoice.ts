@@ -104,14 +104,13 @@ export type DeleteInvoiceSchema = z.infer<typeof deleteInvoiceSchema>;
 
 export const filterInvoicesSchema = z.object({
   ...SupplimentalFieldsFilterSet,
-  subject: FilterSets.string().optional(),
-  number: FilterSets.string().optional(),
+  search: FilterSets.string().optional(),
+  amount: FilterSets.numberRange().optional(),
   date: FilterSets.dateRange().optional(),
   dueDate: FilterSets.dateRange().optional(),
-  currency: FilterSets.discreteValues(currencyCodeSchema).optional(),
-  clientId: FilterSets.discreteValues(supplimentalFields.id).optional(),
+  currency: FilterSets.discreteValues(invoiceFields.currency).optional(),
+  clientId: FilterSets.discreteValues(invoiceFields.clientId).optional(),
   items: FilterSets.discreteValues(itemEntryFields.itemId).optional(),
-  note: FilterSets.string().optional(),
 });
 export type FilterInvoicesSchema = z.infer<typeof filterInvoicesSchema>;
 
