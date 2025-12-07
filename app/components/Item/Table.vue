@@ -15,7 +15,7 @@ import { ShadButton, ShadCheckbox } from '#components';
 import DropdownAction from './EditDropdown.vue';
 import type { ItemSchema, FilterItemsSchema } from '~~/shared/schemas/item';
 
-const { data: itemsData } = useQuery(getItemsColada());
+const { data: itemsData } = useQuery(itemsQueryOptions);
 const items = computed(() => itemsData.value || []);
 
 const columns: ColumnDef<ItemSchema>[] = [

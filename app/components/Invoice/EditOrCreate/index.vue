@@ -28,8 +28,8 @@ const emit = defineEmits<{
 
 const { stopHandles } = useStopHandles();
 
-const { mutate: createInvoice, status: createStatus, isLoading: isCreatingInvoice } = useCreateInvoiceMutation();
-const { mutate: updateInvoice, status: updateStatus, isLoading: isUpdatingInvoice } = useUpdateInvoiceMutation();
+const { mutate: createInvoice, status: createStatus, isPending: isCreatingInvoice } = useCreateInvoiceMutation();
+const { mutate: updateInvoice, status: updateStatus, isPending: isUpdatingInvoice } = useUpdateInvoiceMutation();
 
 const loading = computed(() => isCreatingInvoice.value || isUpdatingInvoice.value);
 const status = useCombinedStatus([createStatus, updateStatus]);
@@ -382,7 +382,7 @@ defineExpose({ submit });
           </ShadFormItem>
         </ShadFormField>
         <div class="flex justify-end">
-          <ShadButton type="submit" variant="default">
+          <ShadButton type="submit" variant="default" :loading="status === 'pending'">
             {{ isUpdating ? 'Update Invoice' : 'Create Invoice' }}
           </ShadButton>
         </div>

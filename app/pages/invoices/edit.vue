@@ -9,7 +9,7 @@ if (!id) {
   await navigateTo('/invoices/new');
 }
 
-const { data: invoice } = useQuery(getInvoiceByIdColada({ id }));
+const { data: invoice } = useQuery(invoiceByIdQueryOptions({ id }));
 </script>
 
 <template>

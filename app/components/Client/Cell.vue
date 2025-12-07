@@ -6,7 +6,7 @@ const props = defineProps<{
   showIcon: boolean;
 }>();
 
-const { data: clients, status } = useQuery(getClientsColada());
+const { data: clients, status } = useQuery(clientsQueryOptions);
 const client = computed(() => clients.value?.find((c) => c.id === props.clientId));
 </script>
 

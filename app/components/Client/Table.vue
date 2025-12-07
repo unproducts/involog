@@ -16,7 +16,7 @@ import DropdownAction from './EditDropdown.vue';
 import type { ClientSchema, FilterClientsSchema } from '~~/shared/schemas/client';
 import { countryDetailsMap } from '~~/shared/consts/countries';
 
-const { data: clientsData } = useQuery(getClientsColada());
+const { data: clientsData } = useQuery(clientsQueryOptions);
 const clients = computed(() => clientsData.value || []);
 
 const columns: ColumnDef<ClientSchema>[] = [

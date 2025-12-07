@@ -16,7 +16,7 @@ import DropdownAction from './EditDropdown.vue';
 import type { FilterTransactionsSchema, TransactionSchema } from '~~/shared/schemas/transaction';
 import { transactionCategoriesMap, type TransactionCategory } from '~~/shared/consts/transactions';
 
-const { data: transactionsData } = useQuery(getTransactionsColada());
+const { data: transactionsData } = useQuery(transactionsQueryOptions());
 const transactions = computed(() => transactionsData.value || []);
 
 const columns: ColumnDef<TransactionSchema>[] = [

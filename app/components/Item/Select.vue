@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { data: items } = useQuery(getItemsColada());
+const { data: items } = useQuery(itemsQueryOptions);
 </script>
 
 <template>

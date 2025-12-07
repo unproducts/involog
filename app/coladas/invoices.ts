@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/vue-query';
 import {
   createInvoiceSchema,
   updateInvoiceSchema,
@@ -8,43 +9,46 @@ import {
   type FilterInvoicesSchema,
 } from '~~/shared/schemas/invoice';
 
-export const getInvoicesColada = defineQueryOptions((params: FilterInvoicesSchema = {}) => ({
-  key: ['invoices', params],
-  query: async () => {
-    const dataGateway = await useDataGateway();
-    return dataGateway.getInvoiceService().fetch(params);
-  },
-  staleTime: DEFAULT_STALE_TIME,
-}));
+export const invoicesQueryOptions = (params: FilterInvoicesSchema = {}) =>
+  queryOptions({
+    queryKey: ['invoices', params],
+    queryFn: async () => {
+      const dataGateway = await useDataGateway();
+      return dataGateway.getInvoiceService().fetch(params);
+    },
+    staleTime: DEFAULT_STALE_TIME,
+  });
 
-export const getInvoiceInfoByIdColada = defineQueryOptions((params: { id: string }) => ({
-  key: ['invoices', 'info', params.id],
-  query: async () => {
-    const dataGateway = await useDataGateway();
-    return dataGateway.getInvoiceService().fetchById(params.id);
-  },
-  staleTime: DEFAULT_STALE_TIME,
-}));
+export const invoiceInfoByIdQueryOptions = (params: { id: string }) =>
+  queryOptions({
+    queryKey: ['invoices', 'info', params.id],
+    queryFn: async () => {
+      const dataGateway = await useDataGateway();
+      return dataGateway.getInvoiceService().fetchById(params.id);
+    },
+    staleTime: DEFAULT_STALE_TIME,
+  });
 
-export const getInvoiceByIdColada = defineQueryOptions((params: { id: string }) => ({
-  key: ['invoices', 'full', params.id],
-  query: async () => {
-    const dataGateway = await useDataGateway();
-    return dataGateway.getInvoiceService().loadById(params.id);
-  },
-  staleTime: DEFAULT_STALE_TIME,
-}));
+export const invoiceByIdQueryOptions = (params: { id: string }) =>
+  queryOptions({
+    queryKey: ['invoices', 'full', params.id],
+    queryFn: async () => {
+      const dataGateway = await useDataGateway();
+      return dataGateway.getInvoiceService().loadById(params.id);
+    },
+    staleTime: DEFAULT_STALE_TIME,
+  });
 
 export const useCreateInvoiceMutation = () => {
-  const { refetch } = useQuery(getInvoicesColada({}));
+  const queryClient = useQueryClient();
   return useMutation({
-    async mutation(rawParams: CreateInvoiceSchema) {
+    mutationFn: async (rawParams: CreateInvoiceSchema) => {
       const params = createInvoiceSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getInvoiceService().create(params);
     },
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
     onError: (error) => {
       console.error('Error creating invoice', error);
@@ -53,19 +57,17 @@ export const useCreateInvoiceMutation = () => {
 };
 
 export const useUpdateInvoiceMutation = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    async mutation(rawParams: UpdateInvoiceSchema) {
+    mutationFn: async (rawParams: UpdateInvoiceSchema) => {
       const params = updateInvoiceSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getInvoiceService().update(params);
     },
     onSuccess: (_, vars) => {
-      const { refetch: refetchInvoices } = useQuery(getInvoicesColada({}));
-      const { refetch: refetchInvoiceInfo } = useQuery(getInvoiceInfoByIdColada({ id: vars.id }));
-      const { refetch: refetchInvoiceFull } = useQuery(getInvoiceByIdColada({ id: vars.id }));
-      refetchInvoiceInfo();
-      refetchInvoiceFull();
-      refetchInvoices();
+      queryClient.invalidateQueries({ queryKey: ['invoices', 'info', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['invoices', 'full', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
     onError: (error, vars) => {
       console.error('Error updating invoice', error, vars);
@@ -74,15 +76,15 @@ export const useUpdateInvoiceMutation = () => {
 };
 
 export const useDeleteInvoiceMutation = () => {
-  const { refetch: refetchInvoices } = useQuery(getInvoicesColada({}));
+  const queryClient = useQueryClient();
   return useMutation({
-    async mutation(rawParams: DeleteInvoiceSchema) {
+    mutationFn: async (rawParams: DeleteInvoiceSchema) => {
       const params = deleteInvoiceSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getInvoiceService().delete(params);
     },
     onSuccess: () => {
-      refetchInvoices();
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
     onError: (error, vars) => {
       console.error('Error deleting invoice', error, vars);

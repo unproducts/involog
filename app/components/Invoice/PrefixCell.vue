@@ -3,7 +3,7 @@ const props = defineProps<{
   prefixId: string;
 }>();
 
-const { data, status } = useQuery(getInvoicePrefixesColada({}));
+const { data, status } = useQuery(invoicePrefixesQueryOptions({}));
 const prefix = computed(() => data.value?.find((p) => p.id === props.prefixId));
 </script>
 

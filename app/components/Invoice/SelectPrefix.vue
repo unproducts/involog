@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { data: invoicePrefixes } = useQuery(getInvoicePrefixesColada({}));
+const { data: invoicePrefixes } = useQuery(invoicePrefixesQueryOptions({}));
 const { mutate: createInvoicePrefix } = useCreateInvoicePrefixMutation();
 
 const open = ref(false);

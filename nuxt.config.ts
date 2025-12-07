@@ -18,12 +18,12 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
-    './app/modules/shad-corrector', // 'shadcn-nuxt' // TODO: remove this once shadcn-nuxt is released further.
-    '@pinia/nuxt',
-    '@pinia/colada-nuxt',
+    // 'shadcn-nuxt' // TODO: remove this once shadcn-nuxt is released further.
+    './app/modules/shad-corrector',
+    '@peterbud/nuxt-query',
   ],
-  pinia: {
-    storesDirs: ['./app/stores'],
+  nuxtQuery: {
+    autoImports: ['useQuery', 'useMutation', 'useQueryClient'],
   },
   tailwindcss: {
     cssPath: ['~/assets/tailwind.css', { injectPosition: 'first' }],

@@ -14,8 +14,8 @@ const emit = defineEmits<{
 
 const { stopHandles } = useStopHandles();
 
-const { mutate: createItem, status: createStatus, isLoading: isCreatingItem } = useCreateItemMutation();
-const { mutate: updateItem, status: updateStatus, isLoading: isUpdatingItem } = useUpdateItemMutation();
+const { mutate: createItem, status: createStatus, isPending: isCreatingItem } = useCreateItemMutation();
+const { mutate: updateItem, status: updateStatus, isPending: isUpdatingItem } = useUpdateItemMutation();
 
 const loading = computed(() => isCreatingItem.value || isUpdatingItem.value);
 const status = useCombinedStatus([createStatus, updateStatus]);

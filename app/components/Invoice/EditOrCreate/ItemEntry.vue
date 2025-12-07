@@ -17,7 +17,7 @@ const itemEntry = useVModel(props, 'modelValue');
 const hasErrors = useVModel(props, 'hasErrors');
 const subtotalFormatted = useVModel(props, 'subtotalFormatted');
 
-const { data: items } = useQuery(getItemsColada());
+const { data: items } = useQuery(itemsQueryOptions);
 
 const { errors, values, handleSubmit } = useForm({
   validationSchema: toTypedSchema(itemEntrySchema),

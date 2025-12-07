@@ -23,10 +23,10 @@ const props = withDefaults(defineProps<Props>(), {
     :as="as"
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
-    :type="props.type || 'button'"
-    :disabled="props.loading"
+    :type="type || 'button'"
+    :disabled="loading"
   >
-    <ShadSpinner v-if="props.loading" class="w-full h-full" />
+    <ShadSpinner v-if="loading" class="w-full h-full" />
     <slot />
   </Primitive>
 </template>

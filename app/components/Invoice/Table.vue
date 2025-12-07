@@ -14,7 +14,7 @@ import { ArrowUpDown, MoreVertical, ReceiptText, Edit3, Filter } from 'lucide-vu
 import { NuxtLink, ShadButton, ShadCheckbox, ClientCell, InvoiceNumberCell, RawDateCell } from '#components';
 import type { InvoiceInfoSchema, FilterInvoicesSchema } from '~~/shared/schemas/invoice';
 
-const { data: invoicesData } = useQuery(getInvoicesColada({}));
+const { data: invoicesData } = useQuery(invoicesQueryOptions({}));
 const invoices = computed(() => invoicesData.value || []);
 
 const columns: ColumnDef<InvoiceInfoSchema>[] = [

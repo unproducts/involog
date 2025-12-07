@@ -25,12 +25,12 @@ const isUpdating = !!props.transaction;
 const {
   mutate: createTransactionMutation,
   status: createStatus,
-  isLoading: isCreatingTransaction,
+  isPending: isCreatingTransaction,
 } = useCreateTransactionMutation();
 const {
   mutate: updateTransactionMutation,
   status: updateStatus,
-  isLoading: isUpdatingTransaction,
+  isPending: isUpdatingTransaction,
 } = useUpdateTransactionMutation();
 
 const loading = computed(() => isCreatingTransaction.value || isUpdatingTransaction.value);

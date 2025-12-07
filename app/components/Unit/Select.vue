@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const selectedValue = useVModel(props, 'modelValue');
 
-const { data: units } = useQuery(getUnitsColada());
+const { data: units } = useQuery(unitsQueryOptions());
 </script>
 
 <template>
