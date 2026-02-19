@@ -3,18 +3,21 @@ import type { MutationStatus } from '@tanstack/vue-query';
 
 export function useCombinedStatus(statuses: Ref<MutationStatus>[]) {
   return computed<MutationStatus>(() => {
-    // If any of the statuses is error, return error
-    if (statuses.some((status) => status.value === 'error')) {
-      return 'error';
-    } else if (statuses.every((status) => status.value === 'success')) {
-      return 'success';
-    } else if (statuses.some((status) => status.value === 'pending')) {
-      // If any status is pending, return pending
+    const values = statuses.map((status) => status.value);
+    const hasPending = values.includes('pending');
+    const hasError = values.includes('error');
+    const hasSuccess = values.includes('success');
+
+    if (hasPending) {
       return 'pending';
-    } else {
-      // Default to idle
-      return 'idle';
     }
+    if (hasError) {
+      return 'error';
+    }
+    if (hasSuccess) {
+      return 'success';
+    }
+    return 'idle';
   });
 }
 
