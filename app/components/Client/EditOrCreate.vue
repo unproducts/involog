@@ -47,7 +47,7 @@ if (isUpdating) {
 
 const submit = form.handleSubmit((values) => {
   if (isUpdating) {
-    updateClient({ ...values, id: props.client!.id });
+    updateClient({ ...values, id: props.client.id });
   } else {
     createClient(values);
   }
