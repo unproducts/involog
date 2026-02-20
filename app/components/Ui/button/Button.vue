@@ -10,11 +10,13 @@ interface Props extends PrimitiveProps {
   class?: HTMLAttributes['class'];
   type?: string;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   as: 'button',
   loading: false,
+  disabled: false,
 });
 </script>
 
@@ -24,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
     :type="type || 'button'"
-    :disabled="loading"
+    :disabled="loading || disabled"
   >
     <ShadSpinner v-if="loading" class="w-full h-full" />
     <slot />
