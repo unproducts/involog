@@ -38,6 +38,7 @@
     "@faker-js/faker": "^9.5.1",
     "@nuxt/kit": "^4.1.2",
     "@nuxtjs/html-validator": "^2.1.0",
+    "@vue/devtools-api": "^8.0.6",
     "html-validator": "^6.0.1",
     "oxc-parser": "^0.87.0"
   }
