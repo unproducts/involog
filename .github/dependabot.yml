@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+
+    # Required for pnpm
+    package-manager: 'pnpm'
+
+    # Optional but recommended
+    open-pull-requests-limit: 5
+
+    # Group minor & patch updates together
+    groups:
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
