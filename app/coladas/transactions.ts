@@ -6,6 +6,7 @@ import {
   type CreateTransactionSchema,
   type UpdateTransactionSchema,
   type FilterTransactionsSchema,
+  type DeleteTransactionSchema,
 } from '~~/shared/schemas/transaction';
 
 export const transactionsQueryOptions = (params: FilterTransactionsSchema = {}) =>
@@ -63,16 +64,15 @@ export const useUpdateTransactionMutation = () => {
   });
 };
 
-export const useDeleteTransactionMutation = (params: { id: string }) => {
+export const useDeleteTransactionMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async () => {
-      const deleteParams = deleteTransactionSchema.parse({ id: params.id });
+    mutationFn: async (rawParams: DeleteTransactionSchema) => {
+      const deleteParams = deleteTransactionSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getTransactionService().delete(deleteParams);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', params.id] });
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
     onError: (error) => {
