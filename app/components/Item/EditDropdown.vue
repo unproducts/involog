@@ -5,6 +5,7 @@ import type { ItemSchema } from '~~/shared/schemas/item';
 const props = defineProps<{
   item: ItemSchema;
 }>();
+const dropdownOpen = ref(false);
 
 const deleteActionOpen = ref(false);
 const archiveActionOpen = ref(false);
@@ -21,7 +22,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
         <Edit3 class="w-4 h-4" />
       </ShadButton>
     </ItemEditOrCreateTrigger>
-    <ShadDropdownMenu>
+    <ShadDropdownMenu v-model:open="dropdownOpen">
       <ShadDropdownMenuTrigger as-child>
         <ShadButton variant="ghost" class="w-8 h-8 p-0">
           <span class="sr-only">Open menu</span>
@@ -41,6 +42,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
             @confirm="
               archiveAction({ ...item, isArchived: !item.isArchived }).then(() => {
                 archiveActionOpen = false;
+                dropdownOpen = false;
               })
             "
           >
@@ -62,6 +64,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
             @confirm="
               deleteAction({ id: item.id }).then(() => {
                 deleteActionOpen = false;
+                dropdownOpen = false;
               })
             "
           >

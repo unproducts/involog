@@ -41,6 +41,8 @@ const form = useForm({
 
 if (isUpdating) {
   form.setValues(props.item || {});
+} else {
+  form.setValues({ isArchived: false });
 }
 
 const submit = form.handleSubmit((values) => {
