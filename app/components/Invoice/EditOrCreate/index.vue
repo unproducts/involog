@@ -53,12 +53,6 @@ const form = useForm({
   validationSchema: formSchema,
 });
 
-if (isUpdating) {
-  form.setValues(props.invoice || {});
-} else {
-  form.setValues({ items: [], taxes: [], discounts: [] });
-}
-
 const showDueDate = ref(false);
 const itemEntries = ref<ItemEntryHolder[]>([]);
 const taxAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
@@ -67,6 +61,26 @@ const discountAdjustmentEntries = ref<AdjustmentEntryHolder[]>([]);
 const itemEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
 const taxAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
 const discountAdjustmentEntryRefs = ref<{ submit: () => Promise<void> }[]>([]);
+
+if (isUpdating) {
+  form.setValues(props.invoice || {});
+  // @ts-expect-error other values will be filled immediately
+  itemEntries.value = props.invoice.items.map((i) => ({
+    entry: i,
+  }));
+
+  // @ts-expect-error other values will be filled immediately
+  discountAdjustmentEntries.value = props.invoice.discounts.map((d) => ({
+    entry: d,
+  }));
+
+  // @ts-expect-error other values will be filled immediately
+  taxAdjustmentEntries.value = props.invoice.taxes.map((t) => ({
+    entry: t,
+  }));
+} else {
+  form.setValues({ items: [], taxes: [], discounts: [], isArchived: false });
+}
 
 const openEntryValue = ref<string | string[] | undefined>(undefined);
 
@@ -122,9 +136,9 @@ const removeDiscountAdjustmentEntry = (index: number) => removeAdjustmentEntry(d
 
 const submitForm = form.handleSubmit(async (values) => {
   if (isUpdating) {
-    updateInvoice(values as any);
+    updateInvoice({ ...values, id: props.invoice.id });
   } else {
-    createInvoice(values as any);
+    createInvoice(values);
   }
 });
 

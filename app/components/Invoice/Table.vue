@@ -13,6 +13,7 @@ import {
 import { ArrowUpDown, MoreVertical, ReceiptText, Edit3, Filter } from 'lucide-vue-next';
 import { NuxtLink, ShadButton, ShadCheckbox, ClientCell, InvoiceNumberCell, RawDateCell } from '#components';
 import type { InvoiceInfoSchema, FilterInvoicesSchema } from '~~/shared/schemas/invoice';
+import DropdownAction from './EditDropdown.vue';
 
 const { data: invoicesData } = useQuery(invoicesQueryOptions({}));
 const invoices = computed(() => invoicesData.value || []);
@@ -88,26 +89,9 @@ const columns: ColumnDef<InvoiceInfoSchema>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      return h('div', { class: 'flex space-x-1 items-center' }, [
-        h(
-          ShadButton,
-          {
-            variant: 'ghost',
-            class: 'w-8 h-8 p-0',
-            as: NuxtLink,
-            to: `/invoices/edit?id=${row.original.id}`,
-          },
-          () => [h('span', { class: 'sr-only' }, 'Edit invoice'), h(Edit3, { class: 'w-4 h-4' })]
-        ),
-        h(
-          ShadButton,
-          {
-            variant: 'ghost',
-            class: 'w-8 h-8 p-0',
-          },
-          () => [h('span', { class: 'sr-only' }, 'Open menu'), h(MoreVertical, { class: 'h-4 w-4' })]
-        ),
-      ]);
+      return h(DropdownAction, {
+        info: row.original,
+      });
     },
   },
 ];

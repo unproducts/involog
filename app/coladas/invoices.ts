@@ -7,6 +7,8 @@ import {
   type UpdateInvoiceSchema,
   type DeleteInvoiceSchema,
   type FilterInvoicesSchema,
+  type UpdateInvoiceInfoSchema,
+  updateInvoiceInfoSchema,
 } from '~~/shared/schemas/invoice';
 
 export const invoicesQueryOptions = (params: FilterInvoicesSchema = {}) =>
@@ -63,6 +65,25 @@ export const useUpdateInvoiceMutation = () => {
       const params = updateInvoiceSchema.parse(rawParams);
       const dataGateway = await useDataGateway();
       return dataGateway.getInvoiceService().update(params);
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['invoices', 'info', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['invoices', 'full', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    },
+    onError: (error, vars) => {
+      console.error('Error updating invoice', error, vars);
+    },
+  });
+};
+
+export const useUpdateInvoiceInfoMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (rawParams: UpdateInvoiceInfoSchema) => {
+      const params = updateInvoiceInfoSchema.parse(rawParams);
+      const dataGateway = await useDataGateway();
+      return dataGateway.getInvoiceService().updateInfo(params);
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['invoices', 'info', vars.id] });
