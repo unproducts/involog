@@ -8,6 +8,7 @@ const itemFields = {
   isService: z.boolean(),
   unitId: supplimentalFields.id,
   currency: currencyCodeSchema,
+  isArchived: z.boolean(),
 };
 
 export const itemSchema = z.object({
