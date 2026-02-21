@@ -13,6 +13,8 @@ import {
   type InvoiceInfoSchema,
   type InvoiceSchema,
   type UpdateInvoiceSchema,
+  type UpdateInvoiceInfoSchema,
+  updateInvoiceInfoSchema,
 } from '~~/shared/schemas/invoice';
 import { extractDate } from '~~/shared/utils/general';
 
@@ -94,17 +96,18 @@ export class InvoiceServiceImpl implements InvoiceService {
     // Map to info shape
     const infos: InvoiceInfoSchema[] = filtered.map((i) =>
       invoiceInfoSchema.parse({
-        id: i.id,
-        createdAt: i.createdAt,
-        updatedAt: i.updatedAt,
-        clientId: i.clientId,
-        subject: i.subject,
-        prefixId: i.prefixId,
-        number: i.number,
-        date: i.date,
-        dueDate: i.dueDate,
-        currency: i.currency,
-      })
+          id: i.id,
+          createdAt: i.createdAt,
+          updatedAt: i.updatedAt,
+          clientId: i.clientId,
+          subject: i.subject,
+          prefixId: i.prefixId,
+          number: i.number,
+          date: i.date,
+          dueDate: i.dueDate,
+          currency: i.currency,
+          isArchived: i.isArchived,
+        })
     );
     return infos;
   }
@@ -112,7 +115,7 @@ export class InvoiceServiceImpl implements InvoiceService {
   async fetchById(id: string): Promise<InvoiceInfoSchema | null> {
     const inv = this.invoices.value.find((c) => c.id === id);
     if (!inv) return null;
-    return {
+    return invoiceInfoSchema.parse({
       id: inv.id,
       createdAt: inv.createdAt,
       updatedAt: inv.updatedAt,
@@ -123,11 +126,14 @@ export class InvoiceServiceImpl implements InvoiceService {
       date: inv.date,
       dueDate: inv.dueDate,
       currency: inv.currency,
-    };
+      isArchived: inv.isArchived,
+    });
   }
 
   async loadById(id: string): Promise<InvoiceSchema | null> {
-    return this.invoices.value.find((c) => c.id === id) || null;
+    const invoice = this.invoices.value.find((c) => c.id === id) || null;
+    console.log({invoice});
+    return invoice
   }
 
   async create(params: CreateInvoiceSchema): Promise<void> {
@@ -139,6 +145,18 @@ export class InvoiceServiceImpl implements InvoiceService {
       updatedAt: new Date().toISOString(),
     };
     this.invoices.value.push(invoice);
+  }
+
+  async updateInfo(params: UpdateInvoiceInfoSchema): Promise<void> {
+    const args = updateInvoiceInfoSchema.parse(params);
+    const existing = this.invoices.value.find((c) => c.id === args.id);
+    if (!existing) {
+      throw new Error('Invoice not found');
+    }
+    const { id, ...rest } = args;
+    this.invoices.value = this.invoices.value.map((i) =>
+      i.id === id ? { ...i, ...rest, updatedAt: new Date().toISOString() } : i
+    );
   }
 
   async update(params: UpdateInvoiceSchema): Promise<void> {

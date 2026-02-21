@@ -18,6 +18,7 @@ import type {
   DeleteInvoiceSchema,
   DeleteInvoicePrefixSchema,
   FilterInvoicePrefixesSchema,
+  UpdateInvoiceInfoSchema,
 } from '~~/shared/schemas/invoice';
 
 import type {
@@ -58,6 +59,7 @@ export interface InvoiceService {
   loadById(id: string): Promise<InvoiceSchema | null>;
   create(params: CreateInvoiceSchema): Promise<void>;
   update(params: UpdateInvoiceSchema): Promise<void>;
+  updateInfo(params: UpdateInvoiceInfoSchema): Promise<void>;
   delete(params: DeleteInvoiceSchema): Promise<void>;
 }
 

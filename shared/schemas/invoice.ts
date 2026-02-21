@@ -78,6 +78,7 @@ const invoiceFields = {
   taxes: z.array(taxEntrySchema),
   discounts: z.array(discountEntrySchema),
   note: z.string().max(5000, 'Note cannot be longer than 5000 chars').optional(),
+  isArchived: z.boolean(),
 };
 
 export const invoiceSchema = z.object({
@@ -123,6 +124,12 @@ export const invoiceInfoFields = {
   date: invoiceFields.date,
   dueDate: invoiceFields.dueDate,
   currency: invoiceFields.currency,
+  isArchived: invoiceFields.isArchived,
 };
 export const invoiceInfoSchema = z.object(invoiceInfoFields);
 export type InvoiceInfoSchema = z.infer<typeof invoiceInfoSchema>;
+
+export const updateInvoiceInfoSchema = z.object({
+  ...invoiceInfoFields,
+});
+export type UpdateInvoiceInfoSchema = z.infer<typeof updateInvoiceInfoSchema>;
