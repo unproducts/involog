@@ -5,6 +5,8 @@ import type { ClientSchema } from '~~/shared/schemas/client';
 defineProps<{
   client: ClientSchema;
 }>();
+const dropdownOpen = ref(false);
+
 const deleteActionOpen = ref(false);
 const archiveActionOpen = ref(false);
 
@@ -20,7 +22,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
         <Edit3 class="w-4 h-4" />
       </ShadButton>
     </ClientEditOrCreateTrigger>
-    <ShadDropdownMenu>
+    <ShadDropdownMenu v-model:open="dropdownOpen">
       <ShadDropdownMenuTrigger as-child>
         <ShadButton variant="ghost" class="w-8 h-8 p-0">
           <span class="sr-only">Open menu</span>
@@ -40,6 +42,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
             @confirm="
               archiveAction({ ...client, isArchived: !client.isArchived }).then(() => {
                 archiveActionOpen = false;
+                dropdownOpen = false;
               })
             "
           >
@@ -60,6 +63,7 @@ const { mutateAsync: archiveAction, isPending: archiveActionLoading } = useUpdat
             @confirm="
               deleteAction({ id: client.id }).then(() => {
                 deleteActionOpen = false;
+                dropdownOpen = false;
               })
             "
           >
