@@ -50,3 +50,21 @@ export const SupplimentalFieldsFilterSet = {
   createdAt: FilterSets.dateTimeRange().optional(),
   updatedAt: FilterSets.dateTimeRange().optional(),
 };
+
+export const BaseBulkActions = ['delete'] as const;
+export const ArchivableEntityBulkActions = [...BaseBulkActions, 'archive', 'unarchive'] as const;
+
+export const BulkUpdateFieldTypes = {
+  discreteValues: (refinement: z.ZodType<string> = z.string()) => z.array(refinement),
+  actions: <T extends readonly [string, ...string[]]>(refinement: T) => z.enum(refinement),
+};
+
+export const DefaultBulkUpdateSchemaFields = {
+  ids: BulkUpdateFieldTypes.discreteValues(),
+  action: BulkUpdateFieldTypes.actions(BaseBulkActions),
+};
+
+export const ArchivableEntityBulkUpdateSchemaFields = {
+  ...DefaultBulkUpdateSchemaFields,
+  action: BulkUpdateFieldTypes.actions(ArchivableEntityBulkActions),
+};
