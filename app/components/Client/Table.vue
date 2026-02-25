@@ -168,7 +168,7 @@ const table = useVueTable({
           <Filter class="w-4 h-4" />
         </ShadButton>
       </ShadToggle>
-      <ClientEditDropdownBulk :clients="selectedClients" v-if="showBulkActions" />
+      <ClientEditDropdownBulk :clients="selectedClients" v-if="showBulkActions" @done="table.resetRowSelection" />
       <ClientEditOrCreateTrigger v-else>
         <ShadButton> New Client </ShadButton>
       </ClientEditOrCreateTrigger>
