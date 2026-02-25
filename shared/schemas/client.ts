@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  ArchivableEntityBulkUpdateSchemaFields,
   countryCodeSchema,
   currencyCodeSchema,
   FilterSets,
@@ -52,3 +53,8 @@ export const filterClientsSchema = z.object({
 });
 
 export type FilterClientsSchema = z.infer<typeof filterClientsSchema>;
+
+export const updateClientBulkSchema = z.object({
+  ...ArchivableEntityBulkUpdateSchemaFields,
+});
+export type UpdateClientBulkSchema = z.infer<typeof updateClientBulkSchema>;
