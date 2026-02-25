@@ -2,9 +2,11 @@ import { queryOptions } from '@tanstack/vue-query';
 import {
   createClientSchema,
   deleteClientSchema,
+  updateClientBulkSchema,
   updateClientSchema,
   type CreateClientSchema,
   type DeleteClientSchema,
+  type UpdateClientBulkSchema,
   type UpdateClientSchema,
 } from '~~/shared/schemas/client';
 
@@ -54,6 +56,26 @@ export const useUpdateClientMutation = () => {
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['clients', vars.id] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+    },
+    onError: (error, vars) => {
+      console.error('Error updating client', error, vars);
+    },
+  });
+};
+
+export const useUpdateClientBulkMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (rawParams: UpdateClientBulkSchema) => {
+      const params = updateClientBulkSchema.parse(rawParams);
+      const dataGateway = await useDataGateway();
+      return dataGateway.getClientService().updateBulk(params);
+    },
+    onSuccess: (_, vars) => {
+      vars.ids.forEach((id) => {
+        queryClient.invalidateQueries({ queryKey: ['clients', id] });
+      });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
     onError: (error, vars) => {
