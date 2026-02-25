@@ -3,6 +3,7 @@ import type {
   CreateClientSchema,
   DeleteClientSchema,
   FilterClientsSchema,
+  UpdateClientBulkSchema,
   UpdateClientSchema,
 } from '~~/shared/schemas/client';
 
@@ -50,6 +51,7 @@ export interface ClientService {
   fetchById(id: string): Promise<ClientSchema | null>;
   create(params: CreateClientSchema): Promise<void>;
   update(params: UpdateClientSchema): Promise<void>;
+  updateBulk(params: UpdateClientBulkSchema): Promise<void>;
   delete(params: DeleteClientSchema): Promise<void>;
 }
 

@@ -11,6 +11,8 @@ import {
   type DeleteClientSchema,
   type FilterClientsSchema,
   type ClientSchema,
+  type UpdateClientBulkSchema,
+  updateClientBulkSchema,
 } from '~~/shared/schemas/client';
 
 export class ClientServiceImpl implements ClientService {
@@ -93,6 +95,37 @@ export class ClientServiceImpl implements ClientService {
     this.clients.value = this.clients.value.map((c) =>
       c.id === id ? { ...c, ...rest, updatedAt: new Date().toISOString() } : c
     );
+  }
+
+  async updateBulk(params: UpdateClientBulkSchema): Promise<void> {
+    const bulkArgs = updateClientBulkSchema.parse(params);
+    const { ids, action } = bulkArgs;
+
+    if (!ids || ids.length === 0) return;
+
+    const now = new Date().toISOString();
+
+    switch (action) {
+      case 'delete':
+        this.clients.value = this.clients.value.filter((c) => !ids.includes(c.id));
+        break;
+
+      case 'archive':
+        this.clients.value = this.clients.value.map((c) =>
+          ids.includes(c.id) ? { ...c, isArchived: true, updatedAt: now } : c
+        );
+        break;
+
+      case 'unarchive':
+        this.clients.value = this.clients.value.map((c) =>
+          ids.includes(c.id) ? { ...c, isArchived: false, updatedAt: now } : c
+        );
+        break;
+
+      default:
+        const _exhaustiveCheck: never = action;
+        throw new Error(`Unsupported bulk action: ${_exhaustiveCheck}`);
+    }
   }
 
   async delete(params: DeleteClientSchema): Promise<void> {
